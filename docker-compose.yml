@@ -1,0 +1,16 @@
+# OPCIONAL — solo para levantar todo junto en CI / smoke test.
+# El dev diario es nativo: `pnpm dev` (ADR-0008). No usar esto para desarrollar.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    env_file: .env
+    ports: ["3000:3000"]
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    ports: ["8080:80"]
+    depends_on: [api]

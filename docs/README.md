@@ -19,6 +19,8 @@ físicos, libros de pagos y grupos de WhatsApp que se usan hoy.
 | 05 | [Diseño UI](05-diseno-ui/mockups.md) | Mockups de las pantallas principales |
 | 06 | [Gestión del proyecto](06-gestion-proyecto/) | [Cronograma y roles](06-gestion-proyecto/cronograma.md) · [Presupuesto](06-gestion-proyecto/presupuesto.md) |
 | 07 | [Anexos](07-anexos/) | [Declaración de uso de IA](07-anexos/declaracion-ia.md) · [Referencias](07-anexos/referencias.md) |
+| 08 | [Convenciones de código](convenciones-codigo.md) | Estilo y diseño obligatorio para TypeScript, React y Fastify |
+| — | [Decisiones de arquitectura (ADR)](adr/) | Registro de decisiones técnicas |
 
 ## Equipo
 
