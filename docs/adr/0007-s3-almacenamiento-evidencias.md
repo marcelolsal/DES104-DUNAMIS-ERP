@@ -1,6 +1,6 @@
 # ADR-0007: Amazon S3 como almacenamiento externo de evidencias
 
-- **Estado:** Aceptado — supersede la parte de **almacenamiento** de [ADR-0001](0001-supabase-plataforma-unica.md)
+- **Estado:** ⛔ Reemplazado por [ADR-0009](0009-supabase-storage-evidencias.md) — se vuelve a Supabase Storage
 - **Fecha:** 2026-08-31
 - **Decisores:** Arquitecto de Software, Backend / DevOps
 
