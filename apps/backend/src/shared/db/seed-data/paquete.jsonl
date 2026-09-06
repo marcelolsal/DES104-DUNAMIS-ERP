@@ -1,0 +1,6 @@
+{"id_paquete":1,"nombre":"Básico","total_horas":20,"precio":"600.00"}
+{"id_paquete":2,"nombre":"Estándar","total_horas":20,"precio":"500.00"}
+{"id_paquete":3,"nombre":"Intensivo","total_horas":15,"precio":"250.00"}
+{"id_paquete":4,"nombre":"Premium","total_horas":30,"precio":"600.00"}
+{"id_paquete":5,"nombre":"Express","total_horas":25,"precio":"600.00"}
+{"id_paquete":6,"nombre":"Fin de semana","total_horas":30,"precio":"500.00"}

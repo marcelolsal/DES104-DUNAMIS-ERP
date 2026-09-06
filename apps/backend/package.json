@@ -8,7 +8,9 @@
     "start": "tsx src/server.ts",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx src/shared/db/seed.ts",
+    "db:seed:gen": "tsx src/shared/db/generate-seed-data.ts"
   },
   "dependencies": {
     "@dunamis/contracts": "workspace:*",

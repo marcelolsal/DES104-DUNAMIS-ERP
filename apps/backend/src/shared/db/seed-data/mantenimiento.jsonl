@@ -1,0 +1,44 @@
+{"id_mantenimiento":1,"id_vehiculo":1,"fecha":"2025-10-29","descripcion":"Cambio de aceite y filtros","costo":"62.00"}
+{"id_mantenimiento":2,"id_vehiculo":1,"fecha":"2026-02-15","descripcion":"Frenos delanteros","costo":"177.00"}
+{"id_mantenimiento":3,"id_vehiculo":1,"fecha":"2025-10-06","descripcion":"Alineación y balanceo","costo":"126.00"}
+{"id_mantenimiento":4,"id_vehiculo":1,"fecha":"2026-05-29","descripcion":"Frenos delanteros","costo":"109.00"}
+{"id_mantenimiento":5,"id_vehiculo":1,"fecha":"2025-09-12","descripcion":"Cambio de bujías","costo":"16.00"}
+{"id_mantenimiento":6,"id_vehiculo":2,"fecha":"2025-11-22","descripcion":"Cambio de aceite y filtros","costo":"73.00"}
+{"id_mantenimiento":7,"id_vehiculo":2,"fecha":"2026-08-16","descripcion":"Cambio de aceite y filtros","costo":"135.00"}
+{"id_mantenimiento":8,"id_vehiculo":3,"fecha":"2025-12-07","descripcion":"Cambio de aceite y filtros","costo":"43.00"}
+{"id_mantenimiento":9,"id_vehiculo":3,"fecha":"2025-11-15","descripcion":"Revisión de embrague","costo":"182.00"}
+{"id_mantenimiento":10,"id_vehiculo":4,"fecha":"2025-09-29","descripcion":"Frenos delanteros","costo":"46.00"}
+{"id_mantenimiento":11,"id_vehiculo":4,"fecha":"2025-10-14","descripcion":"Alineación y balanceo","costo":"132.00"}
+{"id_mantenimiento":12,"id_vehiculo":4,"fecha":"2025-12-06","descripcion":"Rotación de llantas","costo":"54.00"}
+{"id_mantenimiento":13,"id_vehiculo":5,"fecha":"2026-04-27","descripcion":"Cambio de aceite y filtros","costo":"148.00"}
+{"id_mantenimiento":14,"id_vehiculo":5,"fecha":"2025-09-21","descripcion":"Cambio de batería","costo":"81.00"}
+{"id_mantenimiento":15,"id_vehiculo":5,"fecha":"2025-11-21","descripcion":"Alineación y balanceo","costo":"48.00"}
+{"id_mantenimiento":16,"id_vehiculo":5,"fecha":"2025-10-04","descripcion":"Cambio de batería","costo":"153.00"}
+{"id_mantenimiento":17,"id_vehiculo":5,"fecha":"2026-07-01","descripcion":"Alineación y balanceo","costo":"167.00"}
+{"id_mantenimiento":18,"id_vehiculo":6,"fecha":"2025-10-27","descripcion":"Revisión de embrague","costo":"172.00"}
+{"id_mantenimiento":19,"id_vehiculo":6,"fecha":"2026-05-22","descripcion":"Rotación de llantas","costo":"156.00"}
+{"id_mantenimiento":20,"id_vehiculo":7,"fecha":"2025-09-21","descripcion":"Cambio de batería","costo":"38.00"}
+{"id_mantenimiento":21,"id_vehiculo":7,"fecha":"2026-05-19","descripcion":"Revisión de embrague","costo":"103.00"}
+{"id_mantenimiento":22,"id_vehiculo":7,"fecha":"2026-05-21","descripcion":"Cambio de batería","costo":"141.00"}
+{"id_mantenimiento":23,"id_vehiculo":8,"fecha":"2026-05-24","descripcion":"Alineación y balanceo","costo":"20.00"}
+{"id_mantenimiento":24,"id_vehiculo":8,"fecha":"2026-01-13","descripcion":"Cambio de batería","costo":"109.00"}
+{"id_mantenimiento":25,"id_vehiculo":8,"fecha":"2026-05-03","descripcion":"Cambio de aceite y filtros","costo":"28.00"}
+{"id_mantenimiento":26,"id_vehiculo":9,"fecha":"2026-08-27","descripcion":"Cambio de batería","costo":"123.00"}
+{"id_mantenimiento":27,"id_vehiculo":9,"fecha":"2026-08-02","descripcion":"Alineación y balanceo","costo":"109.00"}
+{"id_mantenimiento":28,"id_vehiculo":9,"fecha":"2025-12-08","descripcion":"Cambio de bujías","costo":"104.00"}
+{"id_mantenimiento":29,"id_vehiculo":10,"fecha":"2025-10-20","descripcion":"Rotación de llantas","costo":"175.00"}
+{"id_mantenimiento":30,"id_vehiculo":10,"fecha":"2025-12-25","descripcion":"Cambio de bujías","costo":"193.00"}
+{"id_mantenimiento":31,"id_vehiculo":10,"fecha":"2026-08-11","descripcion":"Alineación y balanceo","costo":"25.00"}
+{"id_mantenimiento":32,"id_vehiculo":11,"fecha":"2025-10-01","descripcion":"Revisión de embrague","costo":"29.00"}
+{"id_mantenimiento":33,"id_vehiculo":12,"fecha":"2025-12-02","descripcion":"Rotación de llantas","costo":"193.00"}
+{"id_mantenimiento":34,"id_vehiculo":12,"fecha":"2026-06-28","descripcion":"Revisión de embrague","costo":"37.00"}
+{"id_mantenimiento":35,"id_vehiculo":12,"fecha":"2026-04-09","descripcion":"Rotación de llantas","costo":"90.00"}
+{"id_mantenimiento":36,"id_vehiculo":12,"fecha":"2026-01-16","descripcion":"Rotación de llantas","costo":"145.00"}
+{"id_mantenimiento":37,"id_vehiculo":13,"fecha":"2026-02-18","descripcion":"Rotación de llantas","costo":"72.00"}
+{"id_mantenimiento":38,"id_vehiculo":13,"fecha":"2026-03-31","descripcion":"Alineación y balanceo","costo":"70.00"}
+{"id_mantenimiento":39,"id_vehiculo":13,"fecha":"2026-03-23","descripcion":"Alineación y balanceo","costo":"182.00"}
+{"id_mantenimiento":40,"id_vehiculo":13,"fecha":"2025-12-05","descripcion":"Cambio de aceite y filtros","costo":"85.00"}
+{"id_mantenimiento":41,"id_vehiculo":14,"fecha":"2026-08-12","descripcion":"Revisión de embrague","costo":"169.00"}
+{"id_mantenimiento":42,"id_vehiculo":14,"fecha":"2026-03-11","descripcion":"Cambio de aceite y filtros","costo":"49.00"}
+{"id_mantenimiento":43,"id_vehiculo":14,"fecha":"2026-06-15","descripcion":"Frenos delanteros","costo":"129.00"}
+{"id_mantenimiento":44,"id_vehiculo":14,"fecha":"2026-08-29","descripcion":"Rotación de llantas","costo":"127.00"}
