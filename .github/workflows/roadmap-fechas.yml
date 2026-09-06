@@ -1,0 +1,84 @@
+name: Roadmap · fechas del cronograma
+
+# Al cerrar un issue, escribe "Completado" (= fecha de cierre) en el Project.
+# Si "Inicio" está vacío, lo iguala a Completado (se asume trabajado en el día).
+# Al reabrir, limpia "Completado" para que la timeline no mienta.
+#
+# Requiere el secret PROJECTS_TOKEN (PAT clásico con scope `project`), porque el
+# GITHUB_TOKEN del repo no puede escribir en Projects v2 de usuario.
+
+on:
+  issues:
+    types: [closed, reopened]
+
+concurrency:
+  group: roadmap-fechas-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+      OWNER: marcelolsal
+      PROJECT_NUMBER: "2"
+      ISSUE_NODE: ${{ github.event.issue.node_id }}
+      ACTION: ${{ github.event.action }}
+      CLOSED_AT: ${{ github.event.issue.closed_at }}
+    steps:
+      - name: Actualizar fechas en el Project
+        run: |
+          set -euo pipefail
+
+          # 1) Project id + ids de los campos Inicio/Completado (por nombre → robusto)
+          gh api graphql -f query='
+            query($o:String!,$n:Int!){
+              user(login:$o){ projectV2(number:$n){
+                id fields(first:50){ nodes{ ... on ProjectV2FieldCommon { id name } } }
+              }}
+            }' -f o="$OWNER" -F n="$PROJECT_NUMBER" > proj.json
+          PROJECT_ID=$(jq -r '.data.user.projectV2.id' proj.json)
+          COMPLETADO=$(jq -r '.data.user.projectV2.fields.nodes[] | select(.name=="Completado") | .id' proj.json)
+          INICIO=$(jq -r '.data.user.projectV2.fields.nodes[] | select(.name=="Inicio") | .id' proj.json)
+
+          # 2) Item del issue dentro de ESTE project (puede estar en varios)
+          gh api graphql -f query='
+            query($id:ID!){ node(id:$id){ ... on Issue {
+              projectItems(first:20){ nodes{ id project{ id } } }
+            }}}' -f id="$ISSUE_NODE" > items.json
+          ITEM_ID=$(jq -r --arg p "$PROJECT_ID" '.data.node.projectItems.nodes[] | select(.project.id==$p) | .id' items.json)
+          if [ -z "$ITEM_ID" ] || [ "$ITEM_ID" = "null" ]; then
+            echo "El issue no está en el Project #$PROJECT_NUMBER. Nada que hacer."; exit 0
+          fi
+
+          # 3) reopened → limpiar Completado
+          if [ "$ACTION" = "reopened" ]; then
+            gh api graphql -f query='
+              mutation($p:ID!,$i:ID!,$f:ID!){
+                clearProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f}){ projectV2Item{ id } }
+              }' -f p="$PROJECT_ID" -f i="$ITEM_ID" -f f="$COMPLETADO" > /dev/null
+            echo "🔄 Reabierto: Completado limpiado."; exit 0
+          fi
+
+          # 4) closed → Completado = fecha de cierre
+          DATE="${CLOSED_AT:0:10}"
+          gh api graphql -f query='
+            mutation($p:ID!,$i:ID!,$f:ID!,$d:Date!){
+              updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{date:$d}}){ projectV2Item{ id } }
+            }' -f p="$PROJECT_ID" -f i="$ITEM_ID" -f f="$COMPLETADO" -f d="$DATE" > /dev/null
+          echo "✅ Completado = $DATE"
+
+          # 5) Si Inicio está vacío → igualarlo a Completado
+          CUR_INICIO=$(gh api graphql -f query='
+            query($id:ID!){ node(id:$id){ ... on ProjectV2Item {
+              fieldValueByName(name:"Inicio"){ ... on ProjectV2ItemFieldDateValue { date } }
+            }}}' -f id="$ITEM_ID" --jq '.data.node.fieldValueByName.date // ""')
+          if [ -z "$CUR_INICIO" ]; then
+            gh api graphql -f query='
+              mutation($p:ID!,$i:ID!,$f:ID!,$d:Date!){
+                updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{date:$d}}){ projectV2Item{ id } }
+              }' -f p="$PROJECT_ID" -f i="$ITEM_ID" -f f="$INICIO" -f d="$DATE" > /dev/null
+            echo "✅ Inicio estaba vacío → $DATE"
+          else
+            echo "· Inicio ya tenía valor ($CUR_INICIO), no se toca."
+          fi
