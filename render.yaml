@@ -1,0 +1,28 @@
+# Blueprint de Render para el backend (ADR-0008). El frontend va en Vercel.
+# Crear el servicio: Render Dashboard → New → Blueprint → apuntar a este repo.
+# Las envVars con `sync: false` NO se versionan: se cargan en el dashboard de
+# Render (son secretas / dependen del proyecto Supabase de producción).
+services:
+  - type: web
+    name: dunamis-api
+    runtime: docker
+    repo: https://github.com/marcelolsal/DES104-DUNAMIS-ERP
+    branch: main # producción despliega desde main; los PR a develop usan preview
+    dockerfilePath: apps/backend/Dockerfile
+    dockerContext: . # el build es workspace-aware desde la raíz
+    healthCheckPath: /health # ruta pública (ver PUBLIC_ROUTES en auth.ts)
+    plan: free
+    region: oregon
+    autoDeploy: true
+    envVars:
+      # Render inyecta PORT automáticamente; el backend lo lee de config.PORT.
+      - key: DATABASE_URL # Supabase (prod) → Settings → Database → Connection string
+        sync: false
+      - key: SUPABASE_URL # Supabase (prod) → Settings → API → Project URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY # Settings → API → service_role (secreta)
+        sync: false
+      - key: SUPABASE_JWT_SECRET # Settings → API → JWT Settings → JWT Secret
+        sync: false
+      - key: SUPABASE_BUCKET_EVIDENCIAS
+        value: evidencias
