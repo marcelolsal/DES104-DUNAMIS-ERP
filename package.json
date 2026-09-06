@@ -17,7 +17,8 @@
     "format:check": "prettier --check .",
     "db:generate": "pnpm --filter @dunamis/backend db:generate",
     "db:migrate": "pnpm --filter @dunamis/backend db:migrate",
-    "db:seed": "pnpm --filter @dunamis/backend db:seed"
+    "db:seed": "pnpm --filter @dunamis/backend db:seed",
+    "db:seed:gen": "pnpm --filter @dunamis/backend db:seed:gen"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

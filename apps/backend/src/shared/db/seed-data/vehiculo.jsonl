@@ -1,0 +1,14 @@
+{"id_vehiculo":1,"placa":"P100-400","modelo":"Mazda 2 2018","kilometraje":26569,"estado":"activo"}
+{"id_vehiculo":2,"placa":"P101-403","modelo":"Nissan March 2023","kilometraje":42216,"estado":"activo"}
+{"id_vehiculo":3,"placa":"P102-406","modelo":"Nissan March 2023","kilometraje":83233,"estado":"en mantenimiento"}
+{"id_vehiculo":4,"placa":"P103-409","modelo":"Mazda 2 2020","kilometraje":89414,"estado":"activo"}
+{"id_vehiculo":5,"placa":"P104-412","modelo":"Suzuki Swift 2021","kilometraje":24492,"estado":"en mantenimiento"}
+{"id_vehiculo":6,"placa":"P105-415","modelo":"Suzuki Swift 2022","kilometraje":58086,"estado":"activo"}
+{"id_vehiculo":7,"placa":"P106-418","modelo":"Toyota Yaris 2016","kilometraje":64949,"estado":"activo"}
+{"id_vehiculo":8,"placa":"P107-421","modelo":"Suzuki Swift 2022","kilometraje":83960,"estado":"activo"}
+{"id_vehiculo":9,"placa":"P108-424","modelo":"Toyota Yaris 2018","kilometraje":75060,"estado":"activo"}
+{"id_vehiculo":10,"placa":"P109-427","modelo":"Suzuki Swift 2017","kilometraje":25902,"estado":"activo"}
+{"id_vehiculo":11,"placa":"P110-430","modelo":"Mazda 2 2019","kilometraje":41629,"estado":"activo"}
+{"id_vehiculo":12,"placa":"P111-433","modelo":"Chevrolet Spark 2019","kilometraje":26174,"estado":"activo"}
+{"id_vehiculo":13,"placa":"P112-436","modelo":"Mazda 2 2020","kilometraje":32813,"estado":"activo"}
+{"id_vehiculo":14,"placa":"P113-439","modelo":"Kia Rio 2022","kilometraje":67949,"estado":"activo"}
