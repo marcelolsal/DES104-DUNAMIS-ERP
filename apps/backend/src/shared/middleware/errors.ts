@@ -8,6 +8,7 @@ export const registerErrorHandler = (app: FastifyInstance) => {
       return reply.code(400).send({ error: "Datos inválidos", detalles: error.flatten() });
     }
     app.log.error(error);
-    return reply.code(error.statusCode ?? 500).send({ error: "Error interno" });
+    const statusCode = (error as { statusCode?: number }).statusCode ?? 500;
+    return reply.code(statusCode).send({ error: "Error interno" });
   });
 };
