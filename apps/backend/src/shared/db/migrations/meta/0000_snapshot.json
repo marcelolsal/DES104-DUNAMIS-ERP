@@ -1,0 +1,420 @@
+{
+  "id": "31b4123d-21e6-4644-a1d8-9a9465a1f36d",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.alumno": {
+      "name": "alumno",
+      "schema": "",
+      "columns": {
+        "id_alumno": {
+          "name": "id_alumno",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(160)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dui": {
+          "name": "dui",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "correo": {
+          "name": "correo",
+          "type": "varchar(160)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contacto_emergencia": {
+          "name": "contacto_emergencia",
+          "type": "varchar(160)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha_inscripcion": {
+          "name": "fecha_inscripcion",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paquete": {
+          "name": "id_paquete",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "alumno_id_paquete_paquete_id_paquete_fk": {
+          "name": "alumno_id_paquete_paquete_id_paquete_fk",
+          "tableFrom": "alumno",
+          "tableTo": "paquete",
+          "columnsFrom": [
+            "id_paquete"
+          ],
+          "columnsTo": [
+            "id_paquete"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.clase": {
+      "name": "clase",
+      "schema": "",
+      "columns": {
+        "id_clase": {
+          "name": "id_clase",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "id_alumno": {
+          "name": "id_alumno",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_instructor": {
+          "name": "id_instructor",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_vehiculo": {
+          "name": "id_vehiculo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha_hora": {
+          "name": "fecha_hora",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "clase_id_alumno_alumno_id_alumno_fk": {
+          "name": "clase_id_alumno_alumno_id_alumno_fk",
+          "tableFrom": "clase",
+          "tableTo": "alumno",
+          "columnsFrom": [
+            "id_alumno"
+          ],
+          "columnsTo": [
+            "id_alumno"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "clase_id_instructor_instructor_id_instructor_fk": {
+          "name": "clase_id_instructor_instructor_id_instructor_fk",
+          "tableFrom": "clase",
+          "tableTo": "instructor",
+          "columnsFrom": [
+            "id_instructor"
+          ],
+          "columnsTo": [
+            "id_instructor"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "clase_id_vehiculo_vehiculo_id_vehiculo_fk": {
+          "name": "clase_id_vehiculo_vehiculo_id_vehiculo_fk",
+          "tableFrom": "clase",
+          "tableTo": "vehiculo",
+          "columnsFrom": [
+            "id_vehiculo"
+          ],
+          "columnsTo": [
+            "id_vehiculo"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.instructor": {
+      "name": "instructor",
+      "schema": "",
+      "columns": {
+        "id_instructor": {
+          "name": "id_instructor",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(160)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "especialidad": {
+          "name": "especialidad",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mantenimiento": {
+      "name": "mantenimiento",
+      "schema": "",
+      "columns": {
+        "id_mantenimiento": {
+          "name": "id_mantenimiento",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "id_vehiculo": {
+          "name": "id_vehiculo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "costo": {
+          "name": "costo",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "mantenimiento_id_vehiculo_vehiculo_id_vehiculo_fk": {
+          "name": "mantenimiento_id_vehiculo_vehiculo_id_vehiculo_fk",
+          "tableFrom": "mantenimiento",
+          "tableTo": "vehiculo",
+          "columnsFrom": [
+            "id_vehiculo"
+          ],
+          "columnsTo": [
+            "id_vehiculo"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pago": {
+      "name": "pago",
+      "schema": "",
+      "columns": {
+        "id_pago": {
+          "name": "id_pago",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "id_alumno": {
+          "name": "id_alumno",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monto": {
+          "name": "monto",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metodo": {
+          "name": "metodo",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pago_id_alumno_alumno_id_alumno_fk": {
+          "name": "pago_id_alumno_alumno_id_alumno_fk",
+          "tableFrom": "pago",
+          "tableTo": "alumno",
+          "columnsFrom": [
+            "id_alumno"
+          ],
+          "columnsTo": [
+            "id_alumno"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.paquete": {
+      "name": "paquete",
+      "schema": "",
+      "columns": {
+        "id_paquete": {
+          "name": "id_paquete",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_horas": {
+          "name": "total_horas",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "precio": {
+          "name": "precio",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vehiculo": {
+      "name": "vehiculo",
+      "schema": "",
+      "columns": {
+        "id_vehiculo": {
+          "name": "id_vehiculo",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "placa": {
+          "name": "placa",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "modelo": {
+          "name": "modelo",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kilometraje": {
+          "name": "kilometraje",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
