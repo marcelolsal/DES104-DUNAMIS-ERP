@@ -1,0 +1,32 @@
+name: Migrar base de producción al llegar a main
+
+# Aplica las migraciones Drizzle pendientes contra la base de PRODUCCIÓN
+# (Supabase) cuando un release entra a main. Render y Vercel redepliegan la app
+# solos (autoDeploy); esto cubre el único paso manual del runbook de despliegue.
+#
+# Requiere el secret PROD_DATABASE_URL (Settings → Secrets and variables →
+# Actions), con el connection string de la Supabase de producción.
+
+on:
+  push:
+    branches: [main]
+    # Solo corre si cambió el schema o las migraciones (evita correr en cada push).
+    paths:
+      - "apps/backend/src/shared/db/migrations/**"
+      - "apps/backend/src/shared/db/schema.ts"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Aplicar migraciones
+        run: pnpm --filter @dunamis/backend db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
