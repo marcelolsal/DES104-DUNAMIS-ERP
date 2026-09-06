@@ -60,8 +60,8 @@ jobs:
             echo "🔄 Reabierto: Completado limpiado."; exit 0
           fi
 
-          # 4) closed → Completado = fecha de cierre (en TZ local, no UTC)
-          DATE=$(TZ="America/Chicago" date -d "$CLOSED_AT" +%F)
+          # 4) closed → Completado = fecha de cierre en UTC-6 fijo (sin horario de verano)
+          DATE=$(TZ="Etc/GMT+6" date -d "$CLOSED_AT" +%F)
           gh api graphql -f query='
             mutation($p:ID!,$i:ID!,$f:ID!,$d:Date!){
               updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{date:$d}}){ projectV2Item{ id } }
