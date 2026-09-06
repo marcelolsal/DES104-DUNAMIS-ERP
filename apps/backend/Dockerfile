@@ -4,11 +4,14 @@ FROM node:22-slim
 WORKDIR /repo
 RUN corepack enable
 
-COPY pnpm-workspace.yaml package.json tsconfig.base.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY packages/contracts ./packages/contracts
 COPY apps/backend ./apps/backend
 
-RUN pnpm install --frozen-lockfile
+# ponytail: sin apps/frontend en la imagen, frozen-lockfile choca por importer
+# faltante. --no-frozen-lockfile resuelve solo root+contracts+backend. Techo:
+# reproducibilidad menor; subir a frozen + copiar manifests si molesta.
+RUN pnpm install --no-frozen-lockfile
 
 WORKDIR /repo/apps/backend
 EXPOSE 3000
