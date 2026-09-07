@@ -24,7 +24,7 @@ alumnos (datos, historial y progreso) y el control de pagos con reportes.
 | Capa | Tecnología |
 |------|-----------|
 | Frontend | React + Vite (desplegado en Vercel) |
-| Backend / API | Node.js + Fastify — API REST (desplegado en Render) |
+| Backend / API | Node.js + Fastify — API REST (desplegado en Docker) |
 | Base de datos | PostgreSQL (Supabase) |
 | Autenticación | Supabase Auth |
 | Almacenamiento de archivos | Supabase Storage |
