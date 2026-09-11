@@ -1,4 +1,8 @@
+import { config as loadEnv } from "dotenv";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
+
+loadEnv({ path: fileURLToPath(new URL("../../../../.env", import.meta.url)) });
 
 // Valida el entorno al arrancar: si falta algo, el proceso falla claro y temprano.
 const envSchema = z.object({

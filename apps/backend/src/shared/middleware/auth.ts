@@ -1,8 +1,12 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { jwtVerify } from "jose";
+import { createClient } from "@supabase/supabase-js";
 import { config } from "../config.js";
 
-const secret = new TextEncoder().encode(config.SUPABASE_JWT_SECRET);
+const supabaseAuth = createClient(
+  config.SUPABASE_URL,
+  config.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { autoRefreshToken: false, persistSession: false } },
+);
 
 export interface AuthUser {
   sub: string;
@@ -22,8 +26,11 @@ export const requireAuth = async (req: FastifyRequest, reply: FastifyReply) => {
     return reply.code(401).send({ error: "Token ausente" });
   }
   try {
-    const { payload } = await jwtVerify(header.slice(7), secret);
-    req.user = { sub: String(payload.sub), role: payload.role as string };
+    const { data, error } = await supabaseAuth.auth.getUser(header.slice(7));
+    if (error || !data.user) {
+      return reply.code(401).send({ error: "Token inválido" });
+    }
+    req.user = { sub: data.user.id, role: data.user.role };
   } catch {
     return reply.code(401).send({ error: "Token inválido" });
   }
