@@ -17,6 +17,11 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
     },
   });
 
+  if (res.status === 401) {
+    await supabase.auth.signOut();
+    throw new Error("La sesión expiró. Inicia sesión nuevamente.");
+  }
+
   if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
   return res.json() as Promise<T>;
 }

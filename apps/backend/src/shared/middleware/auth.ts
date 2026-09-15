@@ -23,7 +23,16 @@ export const requireAuth = async (req: FastifyRequest, reply: FastifyReply) => {
   }
   try {
     const { payload } = await jwtVerify(header.slice(7), secret);
-    req.user = { sub: String(payload.sub), role: payload.role as string };
+    const appMetadata = payload.app_metadata;
+    const role =
+      typeof appMetadata === "object" && appMetadata !== null && "role" in appMetadata
+        ? appMetadata.role
+        : undefined;
+
+    req.user = {
+      sub: String(payload.sub),
+      ...(typeof role === "string" ? { role } : {}),
+    };
   } catch {
     return reply.code(401).send({ error: "Token inválido" });
   }
