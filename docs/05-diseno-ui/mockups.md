@@ -36,10 +36,21 @@ pagos con estudiante, curso, monto, fecha, método y estado.
 
 ![Finanzas — pagos](assets/finanzas-pagos.png)
 
+## 6.5 Vehículos y Mantenimiento
+
+Listado de vehículos con búsqueda, filtro por estado, kilometraje y acceso al
+detalle. La vista de detalle muestra la información del vehículo y su historial
+de mantenimientos.
+
+![Vehículos — listado](assets/vehiculos-listado.png)
+
+![Vehículo — historial de mantenimiento](assets/vehiculo-historial.png)
+
 ## Fuente editable
 
-Los mockups provienen de Figma (plan Starter). Enlazar aquí el archivo de Figma
-del equipo cuando esté disponible, para mantener la fuente editable junto a esta
-documentación.
+Los mockups fueron diseñados en Figma y mantienen la identidad visual oscura con
+acentos naranja de Dunamis / DrivePro.
+
+[Ver archivo editable de Vehículos y Mantenimiento en Figma](https://www.figma.com/design/zS8ORWm8qfY7BWaNb4yZM0)
 
 **Anterior:** [← Modelo de datos](../04-modelo-datos/modelo-datos.md) · **Siguiente:** [Cronograma →](../06-gestion-proyecto/cronograma.md)
