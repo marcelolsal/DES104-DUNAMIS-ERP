@@ -55,7 +55,7 @@ export const clase = pgTable("clase", {
   id_vehiculo: integer("id_vehiculo")
     .notNull()
     .references(() => vehiculo.id_vehiculo),
-  fecha_hora: timestamp("fecha_hora").notNull(),
+  fecha_hora: timestamp("fecha_hora", { mode: "date" }).notNull(),
   estado: varchar("estado", { length: 30 }).notNull(),
 });
 
