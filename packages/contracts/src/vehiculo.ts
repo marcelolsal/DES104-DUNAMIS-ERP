@@ -10,3 +10,10 @@ export const vehiculoSchema = z.object({
   estado: estadoVehiculo,
 });
 export type Vehiculo = z.infer<typeof vehiculoSchema>;
+
+// Payloads de escritura: el id lo genera la base de datos.
+export const nuevoVehiculoSchema = vehiculoSchema.omit({ id_vehiculo: true });
+export type NuevoVehiculo = z.infer<typeof nuevoVehiculoSchema>;
+
+export const actualizarVehiculoSchema = nuevoVehiculoSchema;
+export type ActualizarVehiculo = z.infer<typeof actualizarVehiculoSchema>;

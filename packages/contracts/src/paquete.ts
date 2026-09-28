@@ -7,3 +7,10 @@ export const paqueteSchema = z.object({
   precio: z.number().nonnegative(),
 });
 export type Paquete = z.infer<typeof paqueteSchema>;
+
+// Payloads de escritura: el id lo genera la base de datos.
+export const nuevoPaqueteSchema = paqueteSchema.omit({ id_paquete: true });
+export type NuevoPaquete = z.infer<typeof nuevoPaqueteSchema>;
+
+export const actualizarPaqueteSchema = nuevoPaqueteSchema;
+export type ActualizarPaquete = z.infer<typeof actualizarPaqueteSchema>;
