@@ -11,3 +11,9 @@ export const claseSchema = z.object({
   estado: estadoClase,
 });
 export type Clase = z.infer<typeof claseSchema>;
+
+// Payload de creación/edición: sin id (lo genera la BD); estado por defecto "programada".
+export const nuevoClaseSchema = claseSchema
+  .omit({ id_clase: true, estado: true })
+  .extend({ estado: estadoClase.default("programada") });
+export type NuevoClase = z.infer<typeof nuevoClaseSchema>;
