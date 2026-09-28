@@ -1,23 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Alumno } from "@dunamis/contracts";
 import { estudiantesApi } from "./api/estudiantes.js";
 import { AuthForm } from "./auth/AuthForm.js";
 import { supabase } from "./auth/supabase.js";
 import type { Session } from "@supabase/supabase-js";
+import { MantenimientosPanel } from "./components/MantenimientosPanel.js";
+import { PaquetesPanel } from "./components/PaquetesPanel.js";
+import { VehiculosPanel } from "./components/VehiculosPanel.js";
+import "./app.css";
 
-export function App() {
+type Seccion = "estudiantes" | "paquetes" | "vehiculos" | "mantenimientos";
+
+export const App = (): ReactNode => {
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [alumnos, setAlumnos] = useState<Alumno[]>([]);
   const [error, setError] = useState<string>();
+  const [seccion, setSeccion] = useState<Seccion>("estudiantes");
 
   useEffect(() => {
     let active = true;
 
-    supabase.auth.getSession().then(({ data }) => {
+    void supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       setSession(data.session);
       setAuthLoading(false);
+    }).catch((_error: unknown) => {
+      if (active) setAuthLoading(false);
     });
 
     const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
@@ -33,30 +42,49 @@ export function App() {
 
   useEffect(() => {
     if (!session) return;
-    estudiantesApi.listar().then(setAlumnos).catch((e) => setError(String(e)));
+    void estudiantesApi.listar().then((lista) => {
+      setAlumnos(lista);
+    }).catch((errorDesconocido: unknown) => {
+      setError(String(errorDesconocido));
+    });
   }, [session]);
 
   if (authLoading) return <main style={{ fontFamily: "system-ui", padding: 24 }}>Cargando sesión...</main>;
   if (!session) return <AuthForm />;
 
-  async function handleLogout() {
+  const handleLogout = async (): Promise<void> => {
     const { error: logoutError } = await supabase.auth.signOut();
     if (logoutError) setError(logoutError.message);
-  }
+  };
 
   return (
-    <main style={{ fontFamily: "system-ui", padding: 24 }}>
-      <header style={{ alignItems: "center", display: "flex", justifyContent: "space-between" }}>
-        <h1>DUNAMIS ERP — Estudiantes</h1>
-        <button onClick={handleLogout} type="button">Cerrar sesión</button>
+    <main className="app-page">
+      <header className="app-header">
+        <div>
+          <h1>DUNAMIS ERP</h1>
+          <p>Sesión iniciada como {session.user.email}</p>
+        </div>
+        <button onClick={() => { void handleLogout(); }} type="button">Cerrar sesión</button>
       </header>
-      <p>Sesión iniciada como {session.user.email}</p>
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-      <ul>
-        {alumnos.map((a) => (
-          <li key={a.id_alumno}>{a.nombre}</li>
+      <nav className="tabs" aria-label="Módulos">
+        {(["estudiantes", "paquetes", "vehiculos", "mantenimientos"] as Seccion[]).map((item) => (
+          <button className={seccion === item ? "active" : undefined} key={item} type="button" onClick={() => { setSeccion(item); }}>
+            {item[0]?.toUpperCase()}{item.slice(1)}
+          </button>
         ))}
-      </ul>
+      </nav>
+      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {seccion === "estudiantes" && (
+        <section className="module-panel">
+          <h2>Estudiantes</h2>
+          <ul>{alumnos.map((a) => {
+            return <li key={a.id_alumno}>{a.nombre}</li>;
+          })}</ul>
+        </section>
+      )}
+      {seccion === "paquetes" && <PaquetesPanel />}
+      {seccion === "vehiculos" && <VehiculosPanel />}
+      {seccion === "mantenimientos" && <MantenimientosPanel />}
     </main>
   );
-}
+};
