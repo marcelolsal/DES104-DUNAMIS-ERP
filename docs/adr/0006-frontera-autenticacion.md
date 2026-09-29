@@ -18,7 +18,8 @@ cada quién con qué, para no romper esa centralización.
   **JWT**. Autenticación es lo único que el frontend habla directo con Supabase.
 - **Llamadas de negocio:** el frontend manda el JWT como `Authorization: Bearer`
   a **Fastify**, que lo **verifica localmente** en un middleware (capa
-  transversal) usando `SUPABASE_JWT_SECRET` antes de llegar a cualquier ruta.
+  transversal) usando el JWKS publicado por Supabase antes de llegar a cualquier
+  ruta. El conjunto de claves se cachea en memoria por `jose`.
 - **Autorización por rol** (Admin / Secretaria) se resuelve en Fastify a partir
   del claim de aplicación `app_metadata.role`. El rol PostgreSQL de Supabase
   (`authenticated`) no se usa como rol de negocio.

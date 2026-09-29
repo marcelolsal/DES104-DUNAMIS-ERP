@@ -1,8 +1,10 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { jwtVerify } from "jose";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 import { config } from "../config.js";
 
-const secret = new TextEncoder().encode(config.SUPABASE_JWT_SECRET);
+const jwks = createRemoteJWKSet(
+  new URL(`${config.SUPABASE_URL}/auth/v1/.well-known/jwks.json`),
+);
 
 export interface AuthUser {
   sub: string;
@@ -22,7 +24,10 @@ export const requireAuth = async (req: FastifyRequest, reply: FastifyReply) => {
     return reply.code(401).send({ error: "Token ausente" });
   }
   try {
-    const { payload } = await jwtVerify(header.slice(7), secret);
+    const { payload } = await jwtVerify(header.slice(7), jwks, {
+      issuer: `${config.SUPABASE_URL}/auth/v1`,
+      audience: "authenticated",
+    });
     const appMetadata = payload.app_metadata;
     const role =
       typeof appMetadata === "object" && appMetadata !== null && "role" in appMetadata
