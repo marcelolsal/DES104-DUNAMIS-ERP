@@ -4,6 +4,7 @@ import { registerErrorHandler } from "./shared/middleware/errors.js";
 import { registerAuth } from "./shared/middleware/auth.js";
 import { estudiantesRoutes } from "./modules/estudiantes/estudiantes.routes.js";
 import { clasesRoutes } from "./modules/clases/clases.routes.js";
+import { instructoresRoutes } from "./modules/instructores/instructores.routes.js";
 
 export const buildApp = () => {
   const app = Fastify({ logger: true });
@@ -17,6 +18,8 @@ export const buildApp = () => {
   // Un register por módulo. Copiar este patrón para pagos, clases, instructores, vehiculos.
   app.register(estudiantesRoutes, { prefix: "/api/estudiantes" });
   app.register(clasesRoutes, { prefix: "/api/clases" });
+
+  app.register(instructoresRoutes, { prefix: "/api/instructores" });
 
   return app;
 };
