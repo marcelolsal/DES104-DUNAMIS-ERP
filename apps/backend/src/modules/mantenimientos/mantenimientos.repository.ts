@@ -18,7 +18,7 @@ const aMantenimiento = (registro: typeof mantenimiento.$inferSelect): Mantenimie
 
 const aValoresDePersistencia = (datos: NuevoMantenimiento) => ({
   ...datos,
-  fecha: datos.fecha.toISOString().slice(0, 10),
+  fecha: datos.fecha,
   costo: String(datos.costo),
 });
 

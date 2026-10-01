@@ -33,7 +33,7 @@ export const MantenimientosPanel = (): ReactNode => {
   };
   const guardar = async (event: SyntheticEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault(); setError(undefined); setSuccess(undefined);
-    const datos = { id_vehiculo: Number(formulario.id_vehiculo), fecha: new Date(`${formulario.fecha}T00:00:00`), descripcion: formulario.descripcion, costo: Number(formulario.costo) };
+    const datos = { id_vehiculo: Number(formulario.id_vehiculo), fecha: formulario.fecha, descripcion: formulario.descripcion, costo: Number(formulario.costo) };
     try {
       if (edicion) await mantenimientosApi.actualizar(edicion.id_mantenimiento, datos);
       else await mantenimientosApi.crear(datos);

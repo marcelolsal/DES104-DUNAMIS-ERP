@@ -1,10 +1,11 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { createRemoteJWKSet, jwtVerify } from "jose";
+import { createRemoteJWKSet, decodeProtectedHeader, jwtVerify } from "jose";
 import { config } from "../config.js";
 
 const jwks = createRemoteJWKSet(
   new URL(`${config.SUPABASE_URL}/auth/v1/.well-known/jwks.json`)
 );
+const hmacSecret = new TextEncoder().encode(config.SUPABASE_JWT_SECRET);
 
 export interface AuthUser {
   sub: string;
@@ -31,10 +32,17 @@ export const requireAuth = async (
   try {
     const token = header.slice(7);
 
-    const { payload } = await jwtVerify(token, jwks, {
+    const { alg } = decodeProtectedHeader(token);
+    const verifyOptions = {
       issuer: `${config.SUPABASE_URL}/auth/v1`,
       audience: "authenticated",
-    });
+    };
+    const verification = alg === "HS256"
+      ? jwtVerify(token, hmacSecret, { ...verifyOptions, algorithms: ["HS256"] })
+      : alg === "ES256" || alg === "RS256"
+        ? jwtVerify(token, jwks, { ...verifyOptions, algorithms: [alg] })
+        : Promise.reject(new Error("Algoritmo JWT no admitido"));
+    const { payload } = await verification;
 
     const appMetadata = payload.app_metadata;
 
@@ -49,9 +57,7 @@ export const requireAuth = async (
       sub: String(payload.sub),
       ...(typeof role === "string" ? { role } : {}),
     };
-  } catch (error) {
-    console.error("Error verificando JWT:", error);
-
+  } catch {
     return reply.code(401).send({
       error: "Token inválido",
     });

@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import {
+  idMantenimientoParamsSchema,
   listarMantenimientosQuerySchema,
   type ActualizarMantenimiento,
   type NuevoMantenimiento,
@@ -16,7 +17,7 @@ export const mantenimientosController = {
   },
 
   obtener: async (req: FastifyRequest<{ Params: { id: string } }>) =>
-    mantenimientosService.obtener(Number(req.params.id)),
+    mantenimientosService.obtener(idMantenimientoParamsSchema.parse(req.params).id),
 
   crear: async (req: FastifyRequest<{ Body: NuevoMantenimiento }>, reply: FastifyReply) => {
     const mantenimiento = await mantenimientosService.crear(req.body);
@@ -25,10 +26,10 @@ export const mantenimientosController = {
 
   actualizar: async (
     req: FastifyRequest<{ Params: { id: string }; Body: ActualizarMantenimiento }>,
-  ) => mantenimientosService.actualizar(Number(req.params.id), req.body),
+  ) => mantenimientosService.actualizar(idMantenimientoParamsSchema.parse(req.params).id, req.body),
 
   eliminar: async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    await mantenimientosService.eliminar(Number(req.params.id));
+    await mantenimientosService.eliminar(idMantenimientoParamsSchema.parse(req.params).id);
     return reply.code(204).send();
   },
 };
