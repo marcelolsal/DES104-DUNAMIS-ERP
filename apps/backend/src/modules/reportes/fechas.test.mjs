@@ -1,8 +1,8 @@
-// Test de la lógica pura de fechas del reporte. Sin BD ni env.
+// "Hoy" del reporte = el mismo de pagos (pagos/saldo.ts). Sin BD ni env.
 // Correr: pnpm --filter @dunamis/backend test  (usa node --import tsx --test)
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { hoyEnElSalvador } from "./fechas.ts";
+import { hoyEnElSalvador } from "../pagos/saldo.ts";
 
 test("hoyEnElSalvador: el día cambia a las 06:00 UTC (medianoche UTC-6)", () => {
   assert.equal(hoyEnElSalvador(new Date("2026-10-04T05:59:59Z")), "2026-10-03");

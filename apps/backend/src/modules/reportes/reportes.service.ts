@@ -1,6 +1,6 @@
 import type { ReporteFinanciero, ReporteFinancieroQuery } from "@dunamis/contracts";
 import { reportesRepository } from "./reportes.repository.js";
-import { hoyEnElSalvador } from "./fechas.js";
+import { hoyEnElSalvador } from "../pagos/saldo.js";
 
 // Reglas de negocio. No conoce req/res ni la BD directamente.
 export const reportesService = {

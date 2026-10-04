@@ -14,12 +14,12 @@ export const aCentavos = (monto: number): number => Math.round(monto * 100);
 // Las fechas de abono son de calendario (medianoche UTC → YYYY-MM-DD); "hoy" es
 // el día calendario en El Salvador, no en UTC (que va 6 h adelante).
 const diaEnElSalvador = new Intl.DateTimeFormat("en-CA", { timeZone: "America/El_Salvador" });
+export const hoyEnElSalvador = (ahora: Date): string => diaEnElSalvador.format(ahora);
 
 // Un abono pendiente cuya fecha ya pasó está vencido, aunque nadie lo haya
 // marcado: el estado guardado solo distingue cobrado de por cobrar.
 export const estadoEfectivo = (abono: Pick<Abono, "fecha" | "estado">, hoy: Date): EstadoPago =>
-  abono.estado === "pendiente" &&
-  abono.fecha.toISOString().slice(0, 10) < diaEnElSalvador.format(hoy)
+  abono.estado === "pendiente" && abono.fecha.toISOString().slice(0, 10) < hoyEnElSalvador(hoy)
     ? "vencido"
     : abono.estado;
 
