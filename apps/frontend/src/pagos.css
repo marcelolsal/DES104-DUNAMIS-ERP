@@ -1,0 +1,250 @@
+.pagos-page {
+  color: #f2f3f5;
+  padding: 34px clamp(18px, 3vw, 48px) 48px;
+}
+.pagos-heading {
+  align-items: center;
+  display: flex;
+  gap: 28px;
+  justify-content: space-between;
+  margin: 4px 0 28px;
+}
+.pagos-heading h1 {
+  font-size: clamp(28px, 3.1vw, 42px);
+  font-weight: 900;
+  letter-spacing: -1.8px;
+  margin: 0;
+}
+.pagos-eyebrow {
+  color: #7b8498;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.6px;
+  margin: 0 0 11px;
+}
+.pagos-subtitle {
+  font-size: 14px;
+  letter-spacing: 1.2px;
+  margin: 34px 0 14px;
+}
+.pagos-page button {
+  border-radius: 1px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.pagos-page button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.pagos-primary {
+  background: #ff6b00;
+  border: 1px solid #ff6b00;
+  color: #090b10;
+  padding: 14px 20px;
+  white-space: nowrap;
+}
+.pagos-primary:hover {
+  background: #ff8125;
+}
+.pagos-secondary {
+  background: transparent;
+  border: 1px solid #3a4250;
+  color: #c4c8d0;
+  padding: 14px 20px;
+}
+.pagos-secondary:hover {
+  background: #111722;
+}
+.pagos-toolbar {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.pagos-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pagos-chips button {
+  background: #080c14;
+  border: 1px solid #252d3b;
+  color: #8d95a7;
+  padding: 11px 16px;
+}
+.pagos-chips button:hover {
+  background: #111722;
+}
+.pagos-chips button[aria-pressed="true"] {
+  background: #ff6b00;
+  border-color: #ff6b00;
+  color: #090b10;
+}
+.pagos-toolbar label,
+.pagos-modal label {
+  color: #818b9f;
+  display: grid;
+  font-size: 9px;
+  font-weight: 800;
+  gap: 7px;
+  letter-spacing: 1.4px;
+}
+.pagos-toolbar label {
+  min-width: min(260px, 100%);
+}
+.pagos-toolbar select,
+.pagos-modal select,
+.pagos-modal input {
+  background: #080c14;
+  border: 1px solid #303847;
+  border-radius: 1px;
+  color: #edf0f4;
+  color-scheme: dark;
+  font: inherit;
+  font-size: 13px;
+  height: 42px;
+  padding: 0 11px;
+  width: 100%;
+}
+.pagos-toolbar select:focus,
+.pagos-modal select:focus,
+.pagos-modal input:focus {
+  border-color: #ff7412;
+  outline: 0;
+}
+.pagos-table-wrap {
+  border: 1px solid #222936;
+  overflow-x: auto;
+}
+.pagos-table {
+  border-collapse: collapse;
+  min-width: 760px;
+  width: 100%;
+}
+.pagos-table th {
+  background: #0b0f18;
+  border: 0;
+  color: #687188;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 15px 16px;
+  text-align: left;
+}
+.pagos-table td {
+  border: 0;
+  border-top: 1px solid #171d29;
+  color: #b7bdc9;
+  font-size: 14px;
+  padding: 15px 16px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.pagos-table td strong {
+  color: #f5f5f5;
+}
+.pagos-table tbody tr:hover {
+  background: #0b0f18;
+}
+.pagos-estado {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.pagos-estado.pagado {
+  color: #00d69b;
+}
+.pagos-estado.pendiente {
+  color: #ffc21a;
+}
+.pagos-estado.vencido {
+  color: #ff5d6c;
+}
+.pagos-page button.pagos-link {
+  background: transparent;
+  border: 0;
+  color: #ff6b00;
+  padding: 6px 12px 6px 0;
+}
+.pagos-page button.pagos-link.danger {
+  color: #ff5d6c;
+}
+.pagos-page button.pagos-link:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+.pagos-empty {
+  color: #8a92a4;
+  margin: 0;
+  padding: 28px;
+  text-align: center;
+}
+.pagos-modal {
+  background: #0a0e17;
+  border: 1px solid #303746;
+  color: #f2f3f5;
+  max-height: 90vh;
+  max-width: 560px;
+  overflow-y: auto;
+  padding: 32px;
+  width: calc(100% - 32px);
+}
+.pagos-modal::backdrop {
+  background: #000b;
+}
+.pagos-modal h2 {
+  font-size: 26px;
+  letter-spacing: -0.6px;
+  margin: 0 0 20px;
+}
+.pagos-modal form {
+  display: grid;
+  gap: 14px;
+}
+.pagos-form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+}
+.pagos-saldo {
+  color: #ffc21a;
+  font-size: 13px;
+  margin: 0;
+  min-height: 18px;
+}
+.pagos-page button.pagos-modal-close {
+  background: transparent;
+  border: 0;
+  color: #aeb5c2;
+  font-size: 26px;
+  font-weight: 400;
+  padding: 4px 10px;
+  position: absolute;
+  right: 14px;
+  top: 10px;
+}
+.pagos-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+@media (max-width: 640px) {
+  .pagos-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .pagos-toolbar label {
+    width: 100%;
+  }
+  .pagos-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .pagos-modal {
+    padding: 24px 18px;
+  }
+}
