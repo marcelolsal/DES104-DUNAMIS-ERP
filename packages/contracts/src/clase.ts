@@ -17,3 +17,11 @@ export const nuevoClaseSchema = claseSchema
   .omit({ id_clase: true, estado: true })
   .extend({ estado: estadoClase.default("programada") });
 export type NuevoClase = z.infer<typeof nuevoClaseSchema>;
+
+export const claseAgendaSchema = claseSchema.extend({
+  alumno_nombre: z.string(),
+  instructor_nombre: z.string(),
+  vehiculo_modelo: z.string(),
+  vehiculo_placa: z.string(),
+});
+export type ClaseAgenda = z.infer<typeof claseAgendaSchema>;

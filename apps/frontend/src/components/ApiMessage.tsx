@@ -10,6 +10,20 @@ export const ApiMessage = ({ error, success }: ApiMessageProps): React.JSX.Eleme
   </>
 );
 
+// `detalles` es el flatten() de Zod que manda el backend en los 400:
+// { formErrors: string[], fieldErrors: { campo: string[] } }.
+const detallesDe = (respuesta: object): string => {
+  if (!("detalles" in respuesta)) return "";
+  const { formErrors = [], fieldErrors = {} } = (respuesta.detalles ?? {}) as {
+    formErrors?: string[];
+    fieldErrors?: Record<string, string[]>;
+  };
+  return [
+    ...formErrors,
+    ...Object.entries(fieldErrors).map(([campo, errores]) => `${campo}: ${errores.join(", ")}`),
+  ].join("; ");
+};
+
 export const mensajeDeError = (error: unknown): string => {
   if (!(error instanceof Error)) return "Ocurrió un error inesperado.";
 
@@ -20,7 +34,10 @@ export const mensajeDeError = (error: unknown): string => {
     const respuesta: unknown = JSON.parse(cuerpo);
     if (typeof respuesta === "object" && respuesta !== null) {
       if ("message" in respuesta && typeof respuesta.message === "string") return respuesta.message;
-      if ("error" in respuesta && typeof respuesta.error === "string") return respuesta.error;
+      if ("error" in respuesta && typeof respuesta.error === "string") {
+        const detalle = detallesDe(respuesta);
+        return detalle ? `${respuesta.error} — ${detalle}` : respuesta.error;
+      }
     }
   } catch {
     return error.message;
