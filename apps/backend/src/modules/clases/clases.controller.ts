@@ -6,6 +6,11 @@ import { clasesService } from "./clases.service.js";
 export const clasesController = {
   listar: async () => clasesService.listar(),
 
+  listarAgenda: async (req: FastifyRequest<{ Querystring: { desde: string; hasta: string } }>) =>
+    clasesService.listarAgenda(req.query.desde, req.query.hasta),
+
+  listarOpciones: async () => clasesService.listarOpciones(),
+
   obtener: async (req: FastifyRequest<{ Params: { id: string } }>) =>
     clasesService.obtener(Number(req.params.id)),
 
