@@ -65,7 +65,7 @@ const vehiculos = Array.from({ length: N_VEHICULOS }, (_, i) => ({
   placa: `P${String(100 + i)}-${String(400 + i * 3)}`,
   modelo: `${pick(modelos)} ${randInt(2016, 2023)}`,
   kilometraje: randInt(15_000, 90_000),
-  estado: rnd() < 0.15 ? "en mantenimiento" : "activo",
+  estado: rnd() < 0.15 ? "en_mantenimiento" : "activo",
 }));
 
 // --- Alumnos: inscripciones repartidas en ~14 meses ---

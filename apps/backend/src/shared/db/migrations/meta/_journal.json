@@ -8,6 +8,13 @@
       "when": 1788656765751,
       "tag": "0000_stiff_white_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791088543809,
+      "tag": "0001_vehiculo_placa_unica",
+      "breakpoints": true
     }
   ]
 }

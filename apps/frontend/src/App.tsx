@@ -5,6 +5,10 @@ import { estudiantesApi } from "./api/estudiantes.js";
 import { AuthForm } from "./auth/AuthForm.js";
 import { supabase } from "./auth/supabase.js";
 import type { Session } from "@supabase/supabase-js";
+import { MantenimientosPanel } from "./components/MantenimientosPanel.js";
+import { PaquetesPanel } from "./components/PaquetesPanel.js";
+import { VehiculosPanel } from "./components/VehiculosPanel.js";
+import "./app.css";
 import "./students.css";
 
 const emptyForm: NuevoAlumno = {
@@ -36,6 +40,8 @@ function formFromStudent(student: EstudianteListado): NuevoAlumno {
   };
 }
 
+type Seccion = "estudiantes" | "paquetes" | "vehiculos" | "mantenimientos";
+
 export const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -48,6 +54,7 @@ export const App = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
+  const [seccion, setSeccion] = useState<Seccion>("estudiantes");
 
   useEffect(() => {
     let active = true;
@@ -55,6 +62,8 @@ export const App = () => {
       if (!active) return;
       setSession(data.session);
       setAuthLoading(false);
+    }).catch((_error: unknown) => {
+      if (active) setAuthLoading(false);
     });
     const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
@@ -107,10 +116,10 @@ export const App = () => {
     }
   }
 
-  async function handleLogout() {
+  const handleLogout = async (): Promise<void> => {
     const { error: logoutError } = await supabase.auth.signOut();
     if (logoutError) setError(logoutError.message);
-  }
+  };
 
   if (authLoading) return <main className="students-loading">Cargando sesión...</main>;
   if (!session) return <AuthForm />;
@@ -126,7 +135,17 @@ export const App = () => {
         <div className="students-logo"><span>D</span> DUNAMIS</div>
         <div className="students-user"><strong>{session.user.email}</strong><button onClick={handleLogout} type="button">Cerrar sesión</button></div>
       </header>
-      <section className="students-content">
+      <nav className="tabs" aria-label="Módulos">
+        {(["estudiantes", "paquetes", "vehiculos", "mantenimientos"] as Seccion[]).map((item) => (
+          <button className={seccion === item ? "active" : undefined} key={item} type="button" onClick={() => { setSeccion(item); }}>
+            {item[0]?.toUpperCase()}{item.slice(1)}
+          </button>
+        ))}
+      </nav>
+      {seccion === "paquetes" && <PaquetesPanel />}
+      {seccion === "vehiculos" && <VehiculosPanel />}
+      {seccion === "mantenimientos" && <MantenimientosPanel />}
+      {seccion === "estudiantes" && <section className="students-content">
         <div className="students-heading">
           <div><p className="section-kicker">GESTIÓN</p><h1>ESTUDIANTES</h1></div>
           <button className="primary-button" onClick={openCreate} type="button">+ NUEVO ESTUDIANTE</button>
@@ -157,7 +176,7 @@ export const App = () => {
           </table>
           {visibleStudents.length === 0 && <p className="empty-state">No hay estudiantes que coincidan con la búsqueda.</p>}
         </div>
-      </section>
+      </section>}
       {modalOpen && <StudentModal editing={editing} form={form} loading={loading} packages={packages} onChange={setForm} onClose={() => { setModalOpen(false); }} onSubmit={saveStudent} />}
     </main>
   );

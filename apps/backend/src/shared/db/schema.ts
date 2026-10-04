@@ -38,7 +38,7 @@ export const instructor = pgTable("instructor", {
 
 export const vehiculo = pgTable("vehiculo", {
   id_vehiculo: serial("id_vehiculo").primaryKey(),
-  placa: varchar("placa", { length: 20 }).notNull(),
+  placa: varchar("placa", { length: 20 }).notNull().unique(),
   modelo: varchar("modelo", { length: 120 }).notNull(),
   kilometraje: integer("kilometraje").notNull(),
   estado: varchar("estado", { length: 30 }).notNull(),
