@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SyntheticEvent } from "react";
 import type { EstadoPago, PagoListado, SaldoAlumno } from "@dunamis/contracts";
 import { estudiantesApi } from "../api/estudiantes.js";
@@ -12,9 +12,13 @@ const ESTADOS: EstadoPago[] = ["pagado", "pendiente", "vencido"];
 const METODOS: FormPago["metodo"][] = ["efectivo", "tarjeta", "transferencia"];
 const titulo = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
-// <dialog> nativo: showModal() da foco atrapado, Escape y fondo inerte.
+// <dialog> nativo: showModal() da foco atrapado, Escape y fondo inerte; close()
+// devuelve el foco al botón que lo abrió. React no pinta `autofocus` en el DOM,
+// así que el primer campo se enfoca a mano.
 const abrirDialogo = (dialogo: HTMLDialogElement | null) => {
-  if (dialogo && !dialogo.open) dialogo.showModal();
+  if (!dialogo || dialogo.open) return;
+  dialogo.showModal();
+  dialogo.querySelector("select")?.focus();
 };
 
 interface Modal {
@@ -38,6 +42,7 @@ export const PagosPage = () => {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState<string>();
   const [saldo, setSaldo] = useState<SaldoAlumno>();
+  const dialogo = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -105,8 +110,9 @@ export const PagosPage = () => {
     setSuccess(undefined);
     setAviso(undefined);
   };
+  // Cerrar siempre por close(): dispara onClose (desmonta) y restaura el foco.
   const cerrar = () => {
-    setModal(undefined);
+    dialogo.current?.close();
   };
   const cambiar = (cambios: Partial<FormPago>) => {
     setModal((actual) => actual && { ...actual, form: { ...actual.form, ...cambios } });
@@ -121,7 +127,7 @@ export const PagosPage = () => {
       const datos = armarPago(modal.form);
       if (modal.original) await pagosApi.actualizar(modal.original.id_pago, datos);
       else await pagosApi.crear(datos);
-      setModal(undefined);
+      cerrar();
       setSuccess(modal.original ? "Pago actualizado." : "Abono registrado.");
       setRecarga((n) => n + 1);
     } catch (cause) {
@@ -327,8 +333,13 @@ export const PagosPage = () => {
           onCancel={(event) => {
             if (saving) event.preventDefault();
           }}
-          onClose={cerrar}
-          ref={abrirDialogo}
+          onClose={() => {
+            setModal(undefined);
+          }}
+          ref={(elemento) => {
+            dialogo.current = elemento;
+            abrirDialogo(elemento);
+          }}
         >
           <button
             aria-label="Cerrar"
@@ -350,7 +361,6 @@ export const PagosPage = () => {
             <label>
               ESTUDIANTE
               <select
-                autoFocus
                 required
                 onChange={(event) => {
                   cambiar({ id_alumno: Number(event.target.value) });
