@@ -1,13 +1,11 @@
-import { useEffect, useState, type ReactNode, type SyntheticEvent } from "react";
-import type { Instructor, NuevoInstructor } from "@dunamis/contracts";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import type { Instructor } from "@dunamis/contracts";
 import { instructoresApi, type MetricasInstructor } from "../api/instructores.js";
 import { ApiMessage, mensajeDeError } from "./ApiMessage.js";
+import { InstructorModal } from "./InstructorModal.js";
 import "./instructores.css";
 
-const formularioVacio: NuevoInstructor = { nombre: "", especialidad: "", telefono: "" };
 const formatoHoras = new Intl.NumberFormat("es-SV", { maximumFractionDigits: 1 });
-// Al menos un carácter que no sea espacio: el backend recorta y rechaza vacíos.
-const NO_VACIO = ".*\\S.*";
 
 // Métricas por instructor: sin entrada = cargando, null = la petición falló.
 type MetricasPorId = Record<number, MetricasInstructor | null>;
@@ -21,9 +19,6 @@ export const InstructoresPanel = (): ReactNode => {
   const [success, setSuccess] = useState<string>();
   // undefined = modal cerrado, null = alta, Instructor = edición.
   const [edicion, setEdicion] = useState<Instructor | null>();
-  const [formulario, setFormulario] = useState<NuevoInstructor>(formularioVacio);
-  const [errorModal, setErrorModal] = useState<string>();
-  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
     const cancelacion = new AbortController();
@@ -58,61 +53,18 @@ export const InstructoresPanel = (): ReactNode => {
     };
   }, [version]);
 
-  const modalAbierto = edicion !== undefined;
-  useEffect(() => {
-    if (!modalAbierto) return;
-    const alPulsar = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setEdicion(undefined);
-    };
-    window.addEventListener("keydown", alPulsar);
-    return () => {
-      window.removeEventListener("keydown", alPulsar);
-    };
-  }, [modalAbierto]);
-
   const recargar = () => {
     setVersion((actual) => actual + 1);
   };
 
   const abrirModal = (instructor: Instructor | null) => {
     setEdicion(instructor);
-    setFormulario(
-      instructor
-        ? {
-            nombre: instructor.nombre,
-            especialidad: instructor.especialidad,
-            telefono: instructor.telefono,
-          }
-        : formularioVacio,
-    );
-    setErrorModal(undefined);
     setError(undefined);
     setSuccess(undefined);
   };
-
-  const guardar = async (event: SyntheticEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault();
-    setGuardando(true);
-    setErrorModal(undefined);
-    const datos: NuevoInstructor = {
-      nombre: formulario.nombre.trim(),
-      especialidad: formulario.especialidad.trim(),
-      telefono: formulario.telefono.trim(),
-    };
-    try {
-      if (edicion) await instructoresApi.actualizar(edicion.id_instructor, datos);
-      else await instructoresApi.crear(datos);
-      setSuccess(
-        edicion ? "Instructor actualizado correctamente." : "Instructor creado correctamente.",
-      );
-      setEdicion(undefined);
-      recargar();
-    } catch (errorDesconocido) {
-      setErrorModal(mensajeDeError(errorDesconocido));
-    } finally {
-      setGuardando(false);
-    }
-  };
+  const cerrarModal = useCallback(() => {
+    setEdicion(undefined);
+  }, []);
 
   const eliminar = async (instructor: Instructor) => {
     if (!window.confirm(`¿Eliminar al instructor “${instructor.nombre}”?`)) return;
@@ -126,24 +78,6 @@ export const InstructoresPanel = (): ReactNode => {
       setError(mensajeDeError(errorDesconocido));
     }
   };
-
-  const campo = (nombre: keyof NuevoInstructor, etiqueta: string, maximo: number) => (
-    <label>
-      {etiqueta}
-      <input
-        required
-        autoFocus={nombre === "nombre"}
-        maxLength={maximo}
-        pattern={NO_VACIO}
-        title="No puede estar vacío"
-        type={nombre === "telefono" ? "tel" : "text"}
-        value={formulario[nombre]}
-        onChange={(event) => {
-          setFormulario({ ...formulario, [nombre]: event.target.value });
-        }}
-      />
-    </label>
-  );
 
   return (
     <section className="students-content">
@@ -237,52 +171,16 @@ export const InstructoresPanel = (): ReactNode => {
           })}
         </ul>
       )}
-      {modalAbierto && (
-        <div className="modal-backdrop">
-          <section
-            aria-labelledby="inst-modal-titulo"
-            aria-modal="true"
-            className="student-modal"
-            role="dialog"
-          >
-            <button
-              aria-label="Cerrar"
-              className="modal-close"
-              type="button"
-              onClick={() => {
-                setEdicion(undefined);
-              }}
-            >
-              ×
-            </button>
-            <p className="section-kicker">GESTIÓN</p>
-            <h2 id="inst-modal-titulo">{edicion ? "EDITAR INSTRUCTOR" : "NUEVO INSTRUCTOR"}</h2>
-            <form
-              onSubmit={(event) => {
-                void guardar(event);
-              }}
-            >
-              {campo("nombre", "Nombre", 160)}
-              {campo("especialidad", "Especialidad", 120)}
-              {campo("telefono", "Teléfono", 30)}
-              <ApiMessage error={errorModal} />
-              <div className="modal-actions">
-                <button
-                  className="secondary-button"
-                  type="button"
-                  onClick={() => {
-                    setEdicion(undefined);
-                  }}
-                >
-                  CANCELAR
-                </button>
-                <button className="primary-button" disabled={guardando} type="submit">
-                  {guardando ? "GUARDANDO..." : "GUARDAR"}
-                </button>
-              </div>
-            </form>
-          </section>
-        </div>
+      {edicion !== undefined && (
+        <InstructorModal
+          instructor={edicion}
+          onClose={cerrarModal}
+          onSaved={(mensaje) => {
+            setSuccess(mensaje);
+            setEdicion(undefined);
+            recargar();
+          }}
+        />
       )}
     </section>
   );
