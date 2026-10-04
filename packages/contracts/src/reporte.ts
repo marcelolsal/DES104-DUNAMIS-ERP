@@ -31,6 +31,8 @@ export type ReporteFinancieroQuery = z.infer<typeof reporteFinancieroQuerySchema
 // Indicadores del panel financiero. Los tres totales suman abonos cuya fecha cae
 // en el rango, según su estado efectivo (un pendiente con fecha pasada es vencido).
 // `ingreso_del_dia` es lo cobrado en `hoy` (fecha de El Salvador) y no depende del rango.
+// `saldo_por_cobrar` es la foto actual de cuentas por cobrar (Σ precio del paquete −
+// abonos pagados, por alumno, nunca negativo) y tampoco depende del rango.
 export const reporteFinancieroSchema = z.object({
   desde: fechaPayloadSchema.nullable(),
   hasta: fechaPayloadSchema.nullable(),
@@ -39,5 +41,6 @@ export const reporteFinancieroSchema = z.object({
   cobros_vencidos: z.number().nonnegative(),
   hoy: fechaPayloadSchema,
   ingreso_del_dia: z.number().nonnegative(),
+  saldo_por_cobrar: z.number().nonnegative(),
 });
 export type ReporteFinanciero = z.infer<typeof reporteFinancieroSchema>;

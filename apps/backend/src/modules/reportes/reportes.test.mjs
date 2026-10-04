@@ -41,6 +41,7 @@ const reporte = {
   cobros_vencidos: 699.5,
   hoy: "2026-10-04",
   ingreso_del_dia: 0,
+  saldo_por_cobrar: 1500.25,
 };
 
 beforeEach(() => {
