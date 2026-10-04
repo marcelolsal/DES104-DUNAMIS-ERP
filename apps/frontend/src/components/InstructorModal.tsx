@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode, type SyntheticEvent } from "react";
+import { useEffect, useRef, useState, type ReactNode, type SyntheticEvent } from "react";
 import type { Instructor, NuevoInstructor } from "@dunamis/contracts";
 import { instructoresApi } from "../api/instructores.js";
 import { ApiMessage, mensajeDeError } from "./ApiMessage.js";
@@ -21,6 +21,16 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
   }));
   const [error, setError] = useState<string>();
   const [guardando, setGuardando] = useState(false);
+  // Se captura en el primer render, antes de que el foco entre al modal.
+  const [focoPrevio] = useState(() => document.activeElement as HTMLElement | null);
+  const dialogo = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    dialogo.current?.querySelector("input")?.focus();
+    return () => {
+      focoPrevio?.focus();
+    };
+  }, [focoPrevio]);
 
   useEffect(() => {
     const alPulsar = (event: KeyboardEvent) => {
@@ -58,7 +68,6 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
       {etiqueta}
       <input
         required
-        autoFocus={nombre === "nombre"}
         maxLength={maximo}
         pattern={NO_VACIO}
         title="No puede estar vacío"
@@ -77,6 +86,7 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
         aria-labelledby="inst-modal-titulo"
         aria-modal="true"
         className="student-modal"
+        ref={dialogo}
         role="dialog"
       >
         <button aria-label="Cerrar" className="modal-close" type="button" onClick={onClose}>

@@ -54,6 +54,7 @@ export const InstructoresPanel = (): ReactNode => {
   }, [version]);
 
   const recargar = () => {
+    setMetricas({});
     setVersion((actual) => actual + 1);
   };
 
@@ -120,7 +121,7 @@ export const InstructoresPanel = (): ReactNode => {
       {!errorCarga && instructores?.length === 0 && (
         <p className="inst-estado">No hay instructores registrados.</p>
       )}
-      {!!instructores?.length && (
+      {!errorCarga && !!instructores?.length && (
         <ul className="inst-grid">
           {instructores.map((instructor) => {
             const dato = metricas[instructor.id_instructor];
@@ -136,12 +137,12 @@ export const InstructoresPanel = (): ReactNode => {
                 </p>
                 <dl className="inst-metricas">
                   <div>
-                    <dd>{valor((m) => String(m.estudiantes_asignados))}</dd>
                     <dt>Estudiantes</dt>
+                    <dd>{valor((m) => String(m.estudiantes_asignados))}</dd>
                   </div>
                   <div>
-                    <dd>{valor((m) => `${formatoHoras.format(m.horas_impartidas)}h`)}</dd>
                     <dt>Horas impartidas</dt>
+                    <dd>{valor((m) => `${formatoHoras.format(m.horas_impartidas)}h`)}</dd>
                   </div>
                 </dl>
                 {dato === null && <p className="inst-aviso">No se pudieron cargar las métricas.</p>}
