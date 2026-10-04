@@ -1,11 +1,12 @@
-// apps/backend/src/modules/estudiantes/estudiantes.controller.ts
-
 import type { FastifyRequest, FastifyReply } from "fastify";
-import type { NuevoAlumno, ActualizarAlumno } from "@dunamis/contracts";
+import type { NuevoAlumno } from "@dunamis/contracts";
 import { estudiantesService } from "./estudiantes.service.js";
 
+// Traduce HTTP ↔ negocio. No toca la BD.
 export const estudiantesController = {
   listar: async () => estudiantesService.listar(),
+  listarConDetalle: async () => estudiantesService.listarConDetalle(),
+  paquetes: async () => estudiantesService.paquetes(),
 
   obtener: async (req: FastifyRequest<{ Params: { id: string } }>) =>
     estudiantesService.obtener(Number(req.params.id)),
@@ -15,14 +16,6 @@ export const estudiantesController = {
     return reply.code(201).send(alumno);
   },
 
-  actualizar: async (req: FastifyRequest) => {
-    const { id } = req.params as { id: string };
-    const body = req.body as ActualizarAlumno;
-    return estudiantesService.actualizar(Number(id), body);
-  },
-
-  eliminar: async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    await estudiantesService.eliminar(Number(req.params.id));
-    return reply.code(204).send();
-  },
+  actualizar: async (req: FastifyRequest<{ Params: { id: string }; Body: NuevoAlumno }>) =>
+    estudiantesService.actualizar(Number(req.params.id), req.body),
 };
