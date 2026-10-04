@@ -21,11 +21,11 @@ const cursos = [
   },
   {
     titulo: "Avance por horas",
-    texto: "Tu progreso se mide contra el total de horas de tu paquete y puedes consultarlo.",
+    texto: "Tu progreso se mide contra el total de horas de tu paquete.",
   },
   {
     titulo: "Pagos por abonos",
-    texto: "Cada abono queda registrado y tu saldo pendiente siempre está claro.",
+    texto: "Puedes pagar tu paquete por abonos.",
   },
 ];
 
