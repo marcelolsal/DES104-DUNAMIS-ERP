@@ -65,7 +65,6 @@ test("sin rango → 200 con todo el historial", async () => {
   assert.equal(filtro().desde, undefined);
   assert.equal(filtro().hasta, undefined);
   assert.match(filtro().hoy, /^\d{4}-\d{2}-\d{2}$/u);
-  assert.match(filtro().corteVencidos, /^\d{4}-\d{2}-\d{2}$/u);
 });
 
 test("con rango → el filtro llega al repositorio; un solo día y 366 días son válidos", async () => {
@@ -95,4 +94,13 @@ test("rango inválido → 400 y no consulta", async () => {
     assert.equal(res.json().error, "Datos inválidos");
   }
   assert.equal(reportesRepository.financiero.mock.callCount(), 0);
+});
+
+test("falla de la BD → 500 sin filtrar detalles", async () => {
+  reportesRepository.financiero.mock.mockImplementation(async () => {
+    throw new Error("connection refused 10.0.0.1");
+  });
+  const res = await pedir("/api/reportes/financiero");
+  assert.equal(res.statusCode, 500);
+  assert.deepEqual(res.json(), { error: "Error interno" });
 });

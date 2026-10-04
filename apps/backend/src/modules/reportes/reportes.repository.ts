@@ -6,8 +6,8 @@ import { alumno, pago, paquete } from "../../shared/db/schema.js";
 export interface FiltroReporteFinanciero {
   desde?: string | undefined;
   hasta?: string | undefined;
+  // Fecha de El Salvador: día del ingreso y corte de vencidos.
   hoy: string;
-  corteVencidos: string;
 }
 
 // Suma en PostgreSQL (numeric, exacto) redondeada a centavos; sin filas da 0, no NULL.
@@ -34,7 +34,6 @@ export const reportesRepository = {
     desde,
     hasta,
     hoy,
-    corteVencidos,
   }: FiltroReporteFinanciero): Promise<ReporteFinanciero> => {
     // Rango inclusivo en ambos extremos; sin rango entra todo el historial.
     const enRango =
@@ -47,10 +46,10 @@ export const reportesRepository = {
         .select({
           total_recaudado: sumar(sql`${enRango} and ${pago.estado} = 'pagado'`),
           pendiente_de_cobro: sumar(
-            sql`${enRango} and ${pago.estado} = 'pendiente' and ${pago.fecha} >= ${corteVencidos}`,
+            sql`${enRango} and ${pago.estado} = 'pendiente' and ${pago.fecha} >= ${hoy}`,
           ),
           cobros_vencidos: sumar(
-            sql`${enRango} and (${pago.estado} = 'vencido' or (${pago.estado} = 'pendiente' and ${pago.fecha} < ${corteVencidos}))`,
+            sql`${enRango} and (${pago.estado} = 'vencido' or (${pago.estado} = 'pendiente' and ${pago.fecha} < ${hoy}))`,
           ),
           ingreso_del_dia: sumar(sql`${pago.estado} = 'pagado' and ${pago.fecha} = ${hoy}`),
         })

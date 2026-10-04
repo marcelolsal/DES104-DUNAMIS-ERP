@@ -22,8 +22,7 @@ if (!local) {
   const { alumno, pago, paquete } = await import("../../shared/db/schema.ts");
   const { reportesRepository } = await import("./reportes.repository.ts");
 
-  const reporte = (filtro = {}) =>
-    reportesRepository.financiero({ hoy: "2001-06-15", corteVencidos: "2001-06-15", ...filtro });
+  const reporte = (filtro = {}) => reportesRepository.financiero({ hoy: "2001-06-15", ...filtro });
 
   const saldoAntes = (await reporte()).saldo_por_cobrar;
 
