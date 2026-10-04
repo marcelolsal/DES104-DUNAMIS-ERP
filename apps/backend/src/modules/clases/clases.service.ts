@@ -41,6 +41,23 @@ const validarSolape = async (datos: NuevoClase, excluirId?: number) => {
 export const clasesService = {
   listar: () => clasesRepository.listar(),
 
+  listarAgenda: (desdeIso: string, hastaIso: string) => {
+    const desde = new Date(desdeIso);
+    const hasta = new Date(hastaIso);
+    const rangoMaximoDias = 62;
+    if (
+      Number.isNaN(desde.getTime()) ||
+      Number.isNaN(hasta.getTime()) ||
+      desde >= hasta ||
+      hasta.getTime() - desde.getTime() > rangoMaximoDias * 24 * 60 * 60 * 1000
+    ) {
+      throw err(400, "Rango de fechas inválido");
+    }
+    return clasesRepository.listarAgenda(desde, hasta);
+  },
+
+  listarOpciones: () => clasesRepository.listarOpciones(),
+
   obtener: async (id: number) => {
     const clase = await clasesRepository.obtener(id);
     if (!clase) throw err(404, "Clase no encontrada");
