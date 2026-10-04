@@ -3,14 +3,12 @@
 Prototipos de las pantallas principales, diseñados en Figma. La identidad visual
 usa una interfaz oscura con acentos naranja (marca **Dunamis / DrivePro**).
 
-## 6.1 Landing pública
+## 6.1 Dashboard Principal
 
-Página de inicio orientada a captar alumnos: navegación (Cursos, Instructores,
-Precios, Testimonios, Contactos), llamada a la acción de registro y acceso Admin.
+Página de inicio orientada a resumir las principales actividades realizadas
+por el usuario, con indicadores de progreso, cursos activos, pagos.
 
-![Landing — hero "Tu camino inicia aquí"](assets/landing-hero.jpg)
-
-![Landing — sección de contenido](assets/landing-seccion.png)
+![Dashboard — resumen general](assets/landing-seccion.png)
 
 ## 6.2 Gestión de Estudiantes
 
