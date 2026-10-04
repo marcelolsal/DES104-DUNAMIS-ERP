@@ -1,6 +1,7 @@
 import type { NuevoClase } from "@dunamis/contracts";
 import { config } from "../../shared/config.js";
 import { clasesRepository } from "./clases.repository.js";
+import { rangoAgenda } from "./rango-agenda.js";
 import { solapesCon } from "./solape.js";
 
 const err = (statusCode: number, message: string) =>
@@ -42,21 +43,16 @@ export const clasesService = {
   listar: () => clasesRepository.listar(),
 
   listarAgenda: (desdeIso: string, hastaIso: string) => {
-    const desde = new Date(desdeIso);
-    const hasta = new Date(hastaIso);
-    const rangoMaximoDias = 62;
-    if (
-      Number.isNaN(desde.getTime()) ||
-      Number.isNaN(hasta.getTime()) ||
-      desde >= hasta ||
-      hasta.getTime() - desde.getTime() > rangoMaximoDias * 24 * 60 * 60 * 1000
-    ) {
-      throw err(400, "Rango de fechas inválido");
-    }
-    return clasesRepository.listarAgenda(desde, hasta);
+    const rango = rangoAgenda(desdeIso, hastaIso);
+    if (!rango) throw err(400, "Rango de fechas inválido");
+    return clasesRepository.listarAgenda(rango.desde, rango.hasta);
   },
 
-  listarOpciones: () => clasesRepository.listarOpciones(),
+  // Incluye la duración configurada para que la UI no la duplique como constante.
+  listarOpciones: async () => ({
+    ...(await clasesRepository.listarOpciones()),
+    duracion_min: config.CLASE_DURACION_MIN,
+  }),
 
   obtener: async (id: number) => {
     const clase = await clasesRepository.obtener(id);

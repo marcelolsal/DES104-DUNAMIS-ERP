@@ -6,7 +6,10 @@ import { clasesController } from "./clases.controller.js";
 // Endpoints del módulo. Se montan bajo /api/clases (ver app.ts).
 // La auth es global (registerAuth en app.ts); aquí no se repite.
 export const clasesRoutes = async (app: FastifyInstance) => {
-  app.get<{ Querystring: { desde: string; hasta: string } }>("/agenda", clasesController.listarAgenda);
+  app.get<{ Querystring: { desde: string; hasta: string } }>(
+    "/agenda",
+    clasesController.listarAgenda,
+  );
   app.get("/opciones", clasesController.listarOpciones);
   app.get("/", clasesController.listar);
   app.get("/:id", clasesController.obtener);
