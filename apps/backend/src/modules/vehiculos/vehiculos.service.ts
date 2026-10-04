@@ -4,8 +4,19 @@ import { vehiculosRepository } from "./vehiculos.repository.js";
 const errorDeNegocio = (mensaje: string, statusCode: number) =>
   Object.assign(new Error(mensaje), { statusCode });
 
-const esViolacionDeClaveForanea = (error: unknown) =>
-  typeof error === "object" && error !== null && "code" in error && error.code === "23503";
+const tieneCodigoPg = (error: unknown, codigo: string) =>
+  typeof error === "object" && error !== null && "code" in error && error.code === codigo;
+const esViolacionDeClaveForanea = (error: unknown) => tieneCodigoPg(error, "23503");
+
+// La unicidad de la placa la garantiza la BD; aquí solo se traduce a 409.
+const conPlacaUnica = async <T>(operacion: Promise<T>) => {
+  try {
+    return await operacion;
+  } catch (error) {
+    if (tieneCodigoPg(error, "23505")) throw errorDeNegocio("Ya existe un vehículo con esa placa", 409);
+    throw error;
+  }
+};
 
 const obtenerVehiculo = async (id: number) => {
   const vehiculo = await vehiculosRepository.obtener(id);
@@ -19,10 +30,10 @@ export const vehiculosService = {
 
   obtener: obtenerVehiculo,
 
-  crear: (datos: NuevoVehiculo) => vehiculosRepository.crear(datos),
+  crear: (datos: NuevoVehiculo) => conPlacaUnica(vehiculosRepository.crear(datos)),
 
   actualizar: async (id: number, datos: ActualizarVehiculo) => {
-    const vehiculo = await vehiculosRepository.actualizar(id, datos);
+    const vehiculo = await conPlacaUnica(vehiculosRepository.actualizar(id, datos));
     if (!vehiculo) throw errorDeNegocio("Vehículo no encontrado", 404);
     return vehiculo;
   },

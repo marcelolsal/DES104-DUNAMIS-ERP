@@ -8,13 +8,7 @@ import {
 import { db } from "../../shared/db/client.js";
 import { clase, mantenimiento, vehiculo } from "../../shared/db/schema.js";
 
-// Los fixtures históricos usan "en mantenimiento"; la API conserva el valor
-// canónico del contrato, "en_mantenimiento", sin modificar datos existentes.
-const aVehiculo = (registro: typeof vehiculo.$inferSelect): Vehiculo =>
-  vehiculoSchema.parse({
-    ...registro,
-    estado: registro.estado === "en mantenimiento" ? "en_mantenimiento" : registro.estado,
-  });
+const aVehiculo = (registro: typeof vehiculo.$inferSelect): Vehiculo => vehiculoSchema.parse(registro);
 
 // Única capa que toca la BD (Drizzle). ADR-0004.
 export const vehiculosRepository = {
