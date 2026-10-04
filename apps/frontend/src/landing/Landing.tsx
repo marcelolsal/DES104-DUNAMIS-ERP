@@ -26,6 +26,7 @@ const cursos = [
 const especialidades = ["Ciudad", "Autopista", "Nocturno", "Automático", "Mecánico"];
 
 // Mismo catálogo que apps/backend/src/shared/db/seed-data/paquete.jsonl.
+// ponytail: copia estática; leer de la API cuando exista un endpoint público de paquetes.
 const paquetes = [
   { nombre: "Básico", horas: 20, precio: 600 },
   { nombre: "Estándar", horas: 20, precio: 500 },
@@ -77,7 +78,7 @@ const Encabezado = () => (
     </nav>
     <div className="landing-actions">
       <a className="landing-btn landing-btn--primary" href="#contacto">
-        Regístrate
+        Inscríbete
       </a>
       <a className="landing-btn" href={LOGIN_HASH}>
         Admin
@@ -98,7 +99,7 @@ const Hero = () => (
           Explorar cursos
         </a>
         <a className="landing-btn" href="#contacto">
-          Regístrate
+          Inscríbete
         </a>
       </div>
     </div>
@@ -133,6 +134,7 @@ const Secciones = () => (
     <section className="landing-section" id="precios" aria-labelledby="precios-title">
       <p className="landing-kicker">Precios</p>
       <h2 id="precios-title">Paquetes de clases</h2>
+      <p>Precios de referencia: confirma el paquete vigente al inscribirte.</p>
       <ul className="landing-cards">
         {paquetes.map((paquete) => (
           <li key={paquete.nombre}>
