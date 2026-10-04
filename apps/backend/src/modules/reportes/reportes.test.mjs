@@ -1,7 +1,7 @@
 // Test HTTP del módulo (rutas → controller → service reales) con el repositorio
 // simulado. Sin BD: el env es de mentira y nunca se abre una conexión.
 // Correr: pnpm --filter @dunamis/backend test  (usa node --import tsx --test)
-import { test, mock, beforeEach } from "node:test";
+import { test, mock, beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
 import Fastify from "fastify";
 import { SignJWT } from "jose";
@@ -22,6 +22,7 @@ const app = Fastify();
 registerErrorHandler(app);
 registerAuth(app);
 app.register(reportesRoutes, { prefix: "/api/reportes" });
+after(() => app.close());
 
 const token = await new SignJWT({ sub: "usuario" })
   .setProtectedHeader({ alg: "HS256" })
