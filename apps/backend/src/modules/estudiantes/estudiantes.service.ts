@@ -1,6 +1,11 @@
 import type { EstudianteListado, NuevoAlumno } from "@dunamis/contracts";
 import { estudiantesRepository } from "./estudiantes.repository.js";
 
+const conDependencias = () =>
+  Object.assign(new Error("No se puede eliminar un alumno con clases o pagos asociados"), {
+    statusCode: 409,
+  });
+
 // Reglas de negocio. No conoce req/res ni la BD directamente.
 export const estudiantesService = {
   listar: () => estudiantesRepository.listar(),
@@ -57,5 +62,19 @@ export const estudiantesService = {
     const alumno = await estudiantesRepository.actualizar(id, datos);
     if (!alumno) throw Object.assign(new Error("Alumno no encontrado"), { statusCode: 404 });
     return alumno;
+  },
+
+  eliminar: async (id: number) => {
+    const alumno = await estudiantesRepository.obtener(id);
+    if (!alumno) throw Object.assign(new Error("Alumno no encontrado"), { statusCode: 404 });
+    if (await estudiantesRepository.tieneDependencias(id)) throw conDependencias();
+    try {
+      await estudiantesRepository.eliminar(id);
+    } catch (error) {
+      // FK de Postgres (23503): cubre la carrera entre la comprobación y el borrado.
+      const esFk =
+        typeof error === "object" && error !== null && "code" in error && error.code === "23503";
+      throw esFk ? conDependencias() : error;
+    }
   },
 };

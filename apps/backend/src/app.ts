@@ -7,6 +7,7 @@ import { clasesRoutes } from "./modules/clases/clases.routes.js";
 import { paquetesRoutes } from "./modules/paquetes/paquetes.routes.js";
 import { vehiculosRoutes } from "./modules/vehiculos/vehiculos.routes.js";
 import { mantenimientosRoutes } from "./modules/mantenimientos/mantenimientos.routes.js";
+import { instructoresRoutes } from "./modules/instructores/instructores.routes.js";
 import { pagosRoutes } from "./modules/pagos/pagos.routes.js";
 
 export const buildApp = () => {
@@ -24,6 +25,7 @@ export const buildApp = () => {
   app.register(paquetesRoutes, { prefix: "/api/paquetes" });
   app.register(vehiculosRoutes, { prefix: "/api/vehiculos" });
   app.register(mantenimientosRoutes, { prefix: "/api/mantenimientos" });
+  app.register(instructoresRoutes, { prefix: "/api/instructores" });
   app.register(pagosRoutes, { prefix: "/api/pagos" });
 
   return app;
