@@ -7,8 +7,13 @@ export const registerErrorHandler = (app: FastifyInstance) => {
     if (error instanceof ZodError) {
       return reply.code(400).send({ error: "Datos inválidos", detalles: error.flatten() });
     }
-    app.log.error(error);
     const statusCode = (error as { statusCode?: number }).statusCode ?? 500;
+    // Errores de negocio (4xx) llevan un mensaje útil para el cliente; los 5xx
+    // se ocultan (no filtrar internos) y se loguean.
+    if (statusCode >= 400 && statusCode < 500) {
+      return reply.code(statusCode).send({ error: (error as Error).message });
+    }
+    app.log.error(error);
     return reply.code(statusCode).send({ error: "Error interno" });
   });
 };

@@ -17,10 +17,11 @@ cada quién con qué, para no romper esa centralización.
 - **Login:** el frontend autentica contra **Supabase Auth** (SDK) y obtiene un
   **JWT**. Autenticación es lo único que el frontend habla directo con Supabase.
 - **Llamadas de negocio:** el frontend manda el JWT como `Authorization: Bearer`
-  a **Fastify**, que lo **verifica** en un middleware (capa transversal) usando
-  el secreto/JWKS de Supabase antes de llegar a cualquier ruta.
+  a **Fastify**, que lo **verifica localmente** en un middleware (capa
+  transversal) usando `SUPABASE_JWT_SECRET` antes de llegar a cualquier ruta.
 - **Autorización por rol** (Admin / Secretaria) se resuelve en Fastify a partir
-  de los claims del token.
+  del claim de aplicación `app_metadata.role`. El rol PostgreSQL de Supabase
+  (`authenticated`) no se usa como rol de negocio.
 - **Datos de negocio:** siempre pasan por Fastify. El frontend **no** consulta
   las tablas de negocio directo por el SDK de Supabase.
 - **Auth global por defecto (secure-by-default):** la verificación del JWT se
@@ -40,6 +41,7 @@ Frontend ──Bearer JWT──> Fastify (verifica + autoriza) ──> BD (Drizz
 - Se preserva la API centralizada: toda la lógica y los datos pasan por Fastify.
 - No se implementa manejo de contraseñas ni emisión de tokens (lo hace Supabase).
 - Un único punto de verificación y autorización, en la capa transversal.
+- La verificación local evita una llamada de red a Supabase Auth por cada request.
 
 **Negativas / costos**
 - Fastify depende de la configuración de claves de Supabase para verificar el JWT.
