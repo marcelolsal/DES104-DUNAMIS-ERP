@@ -1,10 +1,11 @@
-import type { ClaseAgenda, NuevoClase } from "@dunamis/contracts";
+import type { Clase, ClaseAgenda, NuevoClase } from "@dunamis/contracts";
 import { api } from "./client.js";
 
 export interface OpcionesClase {
   alumnos: { id: number; nombre: string }[];
   instructores: { id: number; nombre: string; especialidad: string }[];
   vehiculos: { id: number; modelo: string; placa: string; estado: string }[];
+  duracion_min: number;
 }
 
 export const clasesApi = {
@@ -14,5 +15,5 @@ export const clasesApi = {
   },
   opciones: () => api<OpcionesClase>("/api/clases/opciones"),
   crear: (datos: NuevoClase) =>
-    api<ClaseAgenda>("/api/clases", { method: "POST", body: JSON.stringify(datos) }),
+    api<Clase>("/api/clases", { method: "POST", body: JSON.stringify(datos) }),
 };
