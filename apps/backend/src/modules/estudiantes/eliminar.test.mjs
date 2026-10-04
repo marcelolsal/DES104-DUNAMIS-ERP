@@ -62,7 +62,8 @@ test("violación de FK al borrar (23503) → 409; otros errores se propagan", as
 
 test("id no numérico o no positivo → 400 sin tocar el repositorio", async () => {
   const eliminar = simular();
-  for (const id of ["abc", "1.5", "0", "-3"]) assert.equal((await borrar(id)).status, 400);
+  const invalidos = ["abc", "1.5", "0", "-3", "99999999999", "2147483648", "1e3", "0x10", " 1"];
+  for (const id of invalidos) assert.equal((await borrar(id)).status, 400, id);
   assert.equal(estudiantesRepository.obtener.mock.callCount(), 0);
   assert.equal(eliminar.mock.callCount(), 0);
 });
