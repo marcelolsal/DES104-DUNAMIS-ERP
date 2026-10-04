@@ -56,7 +56,7 @@ code review.
 | # | Regla | Regla ESLint / herramienta |
 |---|-------|----------------------------|
 | F1 | **Respetar las 4 capas**: `routes → controller → service → repository`. Cada capa llama solo a la de abajo. | revisión |
-| F2 | **Solo `repository` toca la BD** (Drizzle); solo `storage/s3.ts` conoce S3. | revisión |
+| F2 | **Solo `repository` toca la BD** (Drizzle); solo `shared/storage/storage.ts` conoce el almacenamiento (Supabase Storage). | revisión |
 | F3 | **`controller` no tiene reglas de negocio**; traduce HTTP ↔ servicio. **`service` no ve `req`/`res`.** | revisión |
 | F4 | **Toda entrada se valida** con un esquema Zod de `contracts` (`validateBody`) antes del controller. | revisión |
 | F5 | **Handlers `async`**; errores se lanzan y los captura el error handler central, no `try/catch` repartido. | revisión |

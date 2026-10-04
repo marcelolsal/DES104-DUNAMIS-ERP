@@ -117,7 +117,7 @@ erDiagram
 | id_instructor | int | FK → Instructor | Instructor asignado. |
 | id_vehiculo | int | FK → Vehículo | Vehículo utilizado. |
 | fecha_hora | datetime | | Fecha y hora programada. |
-| estado | varchar | | Estado de la clase (p. ej. programada, impartida). |
+| estado | varchar | | Estado de la clase: `programada`, `impartida` o `cancelada`. |
 
 ### Instructor
 | Campo | Tipo | Clave | Descripción |
@@ -131,10 +131,10 @@ erDiagram
 | Campo | Tipo | Clave | Descripción |
 |-------|------|-------|-------------|
 | id_vehiculo | int | PK | Identificador del vehículo. |
-| placa | varchar | | Placa. |
+| placa | varchar | | Placa (única). |
 | modelo | varchar | | Modelo. |
 | kilometraje | int | | Kilometraje actual. |
-| estado | varchar | | Estado (p. ej. activo, en mantenimiento). |
+| estado | varchar | | Estado: `activo`, `en_mantenimiento` o `baja`. |
 
 ### Mantenimiento
 | Campo | Tipo | Clave | Descripción |

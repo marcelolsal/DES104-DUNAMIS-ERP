@@ -24,7 +24,7 @@ alumnos (datos, historial y progreso) y el control de pagos con reportes.
 | Capa | Tecnología |
 |------|-----------|
 | Frontend | React + Vite (desplegado en Vercel) |
-| Backend / API | Node.js + Fastify — API REST (desplegado en Docker) |
+| Backend / API | Node.js + Fastify — API REST (imagen Docker desplegada en Render) |
 | Base de datos | PostgreSQL (Supabase) |
 | Autenticación | Supabase Auth |
 | Almacenamiento de archivos | Supabase Storage |
@@ -83,7 +83,7 @@ Studio (panel de la base) en http://127.0.0.1:54323.
 ## Documentación
 
 La documentación completa del proyecto (análisis, procesos BPMN, arquitectura,
-modelo de datos, mockups, cronograma y presupuesto) está en
+modelo de datos, mockups, cronograma, presupuesto y manual de usuario) está en
 [`docs/`](docs/README.md).
 
 ## Equipo

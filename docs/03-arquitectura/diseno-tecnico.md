@@ -24,7 +24,7 @@ Usuario (Admin / Secretaria)
    · routes → controller → service → repository
    · shared: auth (verifica JWT) · validación (Zod) · errores
         ├──► PostgreSQL (Supabase) vía Drizzle   (capa de datos)
-        └──► Amazon S3                            (evidencias: contratos, fotos)
+        └──► Supabase Storage                     (evidencias: contratos, fotos)
 
    packages/contracts — esquemas Zod compartidos por frontend y backend
 ```
@@ -35,11 +35,12 @@ Usuario (Admin / Secretaria)
 |------|-----------------|-----------|
 | **Presentación** | Interfaz web que consume la API REST; login contra Supabase Auth. | React + Vite |
 | **Lógica de negocio** | API REST centralizada, organizada en `routes → controller → service → repository` por módulo. | Fastify (Node.js + TypeScript) |
-| **Datos** | Persistencia relacional (acceso vía Drizzle) y almacenamiento de evidencias. | PostgreSQL (Supabase) + Amazon S3 |
+| **Datos** | Persistencia relacional (acceso vía Drizzle) y almacenamiento de evidencias. | PostgreSQL (Supabase) + Supabase Storage |
 
 **Regla de dependencia interna:** dentro de cada módulo cada capa solo llama a la
 de abajo. El `controller` no toca la BD; el `service` no ve `req`/`res`; solo el
-`repository` conoce Drizzle y solo `storage/s3` conoce S3.
+`repository` conoce Drizzle y solo `shared/storage/storage.ts` conoce el
+proveedor de almacenamiento (Supabase Storage).
 
 ## 4.3 Stack tecnológico
 
@@ -50,9 +51,9 @@ de abajo. El `controller` no toca la BD; el `service` no ve `req`/`res`; solo el
 | Lenguaje | **TypeScript** en todo el stack | Zod como fuente única de validación y tipos. | [0003](../adr/0003-typescript-zod-contratos.md) |
 | Base de datos | **PostgreSQL** en **Supabase** | Servicio administrado; acceso vía **Drizzle ORM**. | [0001](../adr/0001-supabase-plataforma-unica.md) · [0004](../adr/0004-drizzle-acceso-a-datos.md) |
 | Autenticación | **Supabase Auth** | Login → JWT verificado en Fastify. Sin módulo de auth propio. | [0001](../adr/0001-supabase-plataforma-unica.md) · [0006](../adr/0006-frontera-autenticacion.md) |
-| Almacenamiento de evidencias | **Amazon S3** | Contratos digitalizados y fotos de vehículos. | [0007](../adr/0007-s3-almacenamiento-evidencias.md) |
+| Almacenamiento de evidencias | **Supabase Storage** | Contratos digitalizados y fotos de vehículos (bucket `evidencias`). Adaptador listo; aún no lo usa ningún módulo. | [0009](../adr/0009-supabase-storage-evidencias.md) |
 | Estructura | **Monorepo** (pnpm workspaces) | `apps/frontend`, `apps/backend`, `packages/contracts`. | [0005](../adr/0005-monorepo-pnpm-contratos.md) |
-| Despliegue | **Docker** (build/deploy); dev nativo | Una imagen por app; dev con `pnpm dev` + Supabase CLI. | [0008](../adr/0008-contenedores-despliegue.md) |
+| Despliegue | **Docker** (build/deploy); dev nativo | Backend como imagen Docker en Render; frontend en Vercel; dev con `pnpm dev` + Supabase CLI. Ver [despliegue](../despliegue.md). | [0008](../adr/0008-contenedores-despliegue.md) |
 
 ## 4.4 Decisiones de diseño
 
