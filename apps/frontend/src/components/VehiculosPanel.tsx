@@ -1,40 +1,106 @@
-import { useEffect, useState, type ReactNode, type SyntheticEvent } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import type { Vehiculo } from "@dunamis/contracts";
 import { vehiculosApi } from "../api/vehiculos.js";
 import { ApiMessage, mensajeDeError } from "./ApiMessage.js";
+import { VehiculoDetalle } from "./VehiculoDetalle.js";
+import { VehiculoModal } from "./VehiculoModal.js";
+import { VehiculosListado, type FiltrosVehiculos } from "./VehiculosListado.js";
+import "../vehiculos.css";
 
-interface VehiculoForm { placa: string; modelo: string; kilometraje: string; estado: Vehiculo["estado"] }
-const formularioVacio: VehiculoForm = { placa: "", modelo: "", kilometraje: "", estado: "activo" };
-const estados: Vehiculo["estado"][] = ["activo", "en_mantenimiento", "baja"];
+interface Aviso {
+  error?: string;
+  success?: string;
+}
+
+// Flota cargada + sus errores de carga (aparte del aviso de la última acción).
+const useVehiculos = () => {
+  const [vehiculos, setVehiculos] = useState<Vehiculo[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState<string>();
+  const [aviso, setAviso] = useState<Aviso>({});
+
+  const cargar = useCallback(async (): Promise<void> => {
+    setCargando(true);
+    try {
+      setVehiculos(await vehiculosApi.listar());
+      setErrorCarga(undefined);
+    } catch (errorDesconocido) {
+      setErrorCarga(mensajeDeError(errorDesconocido));
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void cargar();
+  }, [cargar]);
+
+  const eliminar = (vehiculo: Vehiculo): void => {
+    if (!window.confirm(`¿Eliminar el vehículo ${vehiculo.placa}?`)) return;
+    setAviso({});
+    vehiculosApi
+      .eliminar(vehiculo.id_vehiculo)
+      .then(() => {
+        setVehiculos((actuales) =>
+          actuales.filter((otro) => otro.id_vehiculo !== vehiculo.id_vehiculo),
+        );
+        setAviso({ success: "Vehículo eliminado correctamente." });
+      })
+      .catch((errorDesconocido: unknown) => {
+        setAviso({ error: mensajeDeError(errorDesconocido) });
+      });
+  };
+
+  return { vehiculos, cargando, errorCarga, aviso, setAviso, cargar, eliminar };
+};
 
 export const VehiculosPanel = (): ReactNode => {
-  const [vehiculos, setVehiculos] = useState<Vehiculo[]>([]);
-  const [formulario, setFormulario] = useState<VehiculoForm>(formularioVacio);
-  const [edicion, setEdicion] = useState<Vehiculo | null>(null);
-  const [error, setError] = useState<string>();
-  const [success, setSuccess] = useState<string>();
+  const { vehiculos, cargando, errorCarga, aviso, setAviso, cargar, eliminar } = useVehiculos();
+  const [idSeleccionado, setIdSeleccionado] = useState<number | null>(null);
+  const [filtros, setFiltros] = useState<FiltrosVehiculos>({ busqueda: "", estado: "todos" });
+  // `undefined`: modal cerrado; `null`: alta; un vehículo: edición.
+  const [enModal, setEnModal] = useState<Vehiculo | null>();
+  // Se deriva del listado: editar actualiza el detalle y eliminar lo cierra.
+  const seleccionado = vehiculos.find((vehiculo) => vehiculo.id_vehiculo === idSeleccionado);
 
-  const cargar = async () => { try { setVehiculos(await vehiculosApi.listar()); setError(undefined); } catch (errorDesconocido) { setError(mensajeDeError(errorDesconocido)); } };
-  useEffect(() => { void cargar(); }, []);
-  const cancelar = () => { setEdicion(null); setFormulario(formularioVacio); };
-  const prepararEdicion = (vehiculo: Vehiculo) => { setEdicion(vehiculo); setFormulario({ placa: vehiculo.placa, modelo: vehiculo.modelo, kilometraje: String(vehiculo.kilometraje), estado: vehiculo.estado }); setError(undefined); setSuccess(undefined); };
-  const guardar = async (event: SyntheticEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault(); setError(undefined); setSuccess(undefined);
-    const datos = { ...formulario, kilometraje: Number(formulario.kilometraje) };
-    try { if (edicion) await vehiculosApi.actualizar(edicion.id_vehiculo, datos); else await vehiculosApi.crear(datos); setSuccess(edicion ? "Vehículo actualizado correctamente." : "Vehículo creado correctamente."); cancelar(); await cargar(); } catch (errorDesconocido) { setError(mensajeDeError(errorDesconocido)); }
+  const seleccionar = (idVehiculo: number | null): void => {
+    setIdSeleccionado(idVehiculo);
+    setAviso({});
   };
-  const eliminar = async (vehiculo: Vehiculo) => {
-    if (!window.confirm(`¿Eliminar el vehículo ${vehiculo.placa}?`)) return;
-    setError(undefined); setSuccess(undefined);
-    try { await vehiculosApi.eliminar(vehiculo.id_vehiculo); setSuccess("Vehículo eliminado correctamente."); await cargar(); } catch (errorDesconocido) { setError(mensajeDeError(errorDesconocido)); }
+  const cerrarModal = (): void => {
+    setEnModal(undefined);
   };
-  return <section className="module-panel">
-    <div className="module-heading"><div><h2>Vehículos</h2><p>Administra la flota de vehículos.</p></div><button type="button" onClick={() => { void cargar(); }}>Actualizar listado</button></div>
-    <ApiMessage error={error} success={success} />
-    <form className="record-form" onSubmit={(event) => { void guardar(event); }}><h3>{edicion ? `Editar vehículo #${String(edicion.id_vehiculo)}` : "Crear vehículo"}</h3>
-      <label>Placa<input required value={formulario.placa} onChange={(event) => { setFormulario({ ...formulario, placa: event.target.value }); }} /></label><label>Modelo<input required value={formulario.modelo} onChange={(event) => { setFormulario({ ...formulario, modelo: event.target.value }); }} /></label><label>Kilometraje<input required type="number" step="1" value={formulario.kilometraje} onChange={(event) => { setFormulario({ ...formulario, kilometraje: event.target.value }); }} /></label><label>Estado<select value={formulario.estado} onChange={(event) => { setFormulario({ ...formulario, estado: event.target.value as Vehiculo["estado"] }); }}>{estados.map((estado) => <option key={estado} value={estado}>{estado}</option>)}</select></label>
-      <div className="form-actions"><button className="primary" type="submit">{edicion ? "Guardar cambios" : "Crear vehículo"}</button>{edicion && <button type="button" onClick={cancelar}>Cancelar</button>}</div>
-    </form>
-    <div className="table-wrap"><table><thead><tr><th>ID</th><th>Placa</th><th>Modelo</th><th>Kilometraje</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{vehiculos.map((vehiculo) => <tr key={vehiculo.id_vehiculo}><td>{vehiculo.id_vehiculo}</td><td>{vehiculo.placa}</td><td>{vehiculo.modelo}</td><td>{vehiculo.kilometraje}</td><td>{vehiculo.estado}</td><td className="actions"><button type="button" onClick={() => { prepararEdicion(vehiculo); }}>Editar</button><button className="danger" type="button" onClick={() => { void eliminar(vehiculo); }}>Eliminar</button></td></tr>)}{!vehiculos.length && <tr><td colSpan={6}>No hay vehículos para mostrar.</td></tr>}</tbody></table></div>
-  </section>;
+  const alGuardar = (mensaje: string): void => {
+    setEnModal(undefined);
+    setAviso({ success: mensaje });
+    void cargar();
+  };
+  const acciones = { onSeleccionar: seleccionar, onEditar: setEnModal, onEliminar: eliminar };
+
+  return (
+    <section className="fleet-page" aria-labelledby="fleet-title">
+      <ApiMessage error={errorCarga} />
+      <ApiMessage error={aviso.error} success={aviso.success} />
+      {seleccionado ? (
+        <VehiculoDetalle
+          key={seleccionado.id_vehiculo}
+          vehiculo={seleccionado}
+          onAviso={setAviso}
+          {...acciones}
+        />
+      ) : (
+        <VehiculosListado
+          vehiculos={vehiculos}
+          cargando={cargando}
+          cargaFallida={errorCarga !== undefined}
+          filtros={filtros}
+          onFiltros={setFiltros}
+          {...acciones}
+        />
+      )}
+      {enModal !== undefined && (
+        <VehiculoModal vehiculo={enModal} onCerrar={cerrarModal} onGuardado={alGuardar} />
+      )}
+    </section>
+  );
 };
