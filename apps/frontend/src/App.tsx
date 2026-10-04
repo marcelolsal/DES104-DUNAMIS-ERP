@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import type { NuevoAlumno, Paquete, EstudianteListado } from "@dunamis/contracts";
 import { estudiantesApi } from "./api/estudiantes.js";
-import { AuthForm } from "./auth/AuthForm.js";
+import { VistaPublica } from "./landing/Landing.js";
 import { supabase } from "./auth/supabase.js";
 import type { Session } from "@supabase/supabase-js";
 import { MantenimientosPanel } from "./components/MantenimientosPanel.js";
@@ -122,7 +122,7 @@ export const App = () => {
   };
 
   if (authLoading) return <main className="students-loading">Cargando sesión...</main>;
-  if (!session) return <AuthForm />;
+  if (!session) return <VistaPublica />;
 
   const visibleStudents = students.filter((student) => {
     const matchesSearch = `${student.nombre} ${student.correo}`.toLowerCase().includes(search.toLowerCase());
