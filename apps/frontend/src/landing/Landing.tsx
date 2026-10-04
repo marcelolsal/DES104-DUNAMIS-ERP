@@ -6,12 +6,18 @@ import "./landing.css";
 
 const LOGIN_HASH = "#login";
 
+// Contenido: solo lo respaldado por el repo. Titular y bajada salen del mockup
+// docs/05-diseno-ui/assets/landing-hero.jpg; el proceso de inscripción (secretaría, abono,
+// programación de clases), de docs/02-procesos/bpmn.md. El repo no define teléfono, correo,
+// dirección ni testimonios, y aún no hay registro público: por eso el CTA de registro
+// lleva a la sección Contacto, que explica cómo inscribirse sin datos inventados.
+
 const secciones = ["Cursos", "Instructores", "Precios", "Testimonios", "Contacto"];
 
 const cursos = [
   {
     titulo: "Clases prácticas programadas",
-    texto: "Cada clase se agenda con instructor y vehículo asignados, sin choques de horario.",
+    texto: "Cada clase se agenda con un instructor y un vehículo asignados.",
   },
   {
     titulo: "Avance por horas",
@@ -72,7 +78,7 @@ const Encabezado = () => (
     </nav>
     <div className="landing-actions">
       <a className="landing-btn landing-btn--primary" href="#contacto">
-        Inscríbete
+        Cómo inscribirme
       </a>
       <a className="landing-btn" href={LOGIN_HASH}>
         Admin
@@ -93,7 +99,7 @@ const Hero = () => (
           Explorar cursos
         </a>
         <a className="landing-btn" href="#contacto">
-          Inscríbete
+          Cómo inscribirme
         </a>
       </div>
     </div>
@@ -130,7 +136,8 @@ const Secciones = () => (
       <h2 id="precios-title">Paquetes de clases</h2>
       <p>
         El precio depende del paquete y de sus horas de clase. Te lo detallamos al inscribirte y
-        puedes pagarlo por abonos.
+        puedes pagarlo por abonos. La lista es informativa: la oferta vigente se confirma en la
+        inscripción.
       </p>
       <ul className="landing-tags">
         {paquetes.map((paquete) => (
@@ -150,7 +157,7 @@ const Cierre = () => (
     </section>
     <section className="landing-section" id="contacto" aria-labelledby="contacto-title">
       <p className="landing-kicker">Contacto</p>
-      <h2 id="contacto-title">Inscríbete en Dunamis</h2>
+      <h2 id="contacto-title">Cómo inscribirte</h2>
       <p>
         La inscripción se realiza en la secretaría de la autoescuela: te explicamos los paquetes,
         registramos tus datos y tu primer abono, y programamos tus clases.
