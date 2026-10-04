@@ -18,4 +18,13 @@ export const estudiantesController = {
 
   actualizar: async (req: FastifyRequest<{ Params: { id: string }; Body: NuevoAlumno }>) =>
     estudiantesService.actualizar(Number(req.params.id), req.body),
+
+  eliminar: async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+    const id = Number(req.params.id);
+    // Solo dígitos y dentro del integer de Postgres; si no, la consulta revienta con 500.
+    if (!/^\d+$/.test(req.params.id) || id < 1 || id > 2147483647)
+      return reply.code(400).send({ error: "Id inválido" });
+    await estudiantesService.eliminar(id);
+    return reply.code(204).send();
+  },
 };

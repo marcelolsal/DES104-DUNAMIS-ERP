@@ -15,4 +15,5 @@ export const estudiantesRoutes = async (app: FastifyInstance) => {
     { preHandler: validateBody(nuevoAlumnoSchema) },
     estudiantesController.actualizar,
   );
+  app.delete<{ Params: { id: string } }>("/:id", estudiantesController.eliminar);
 };

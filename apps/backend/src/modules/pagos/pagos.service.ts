@@ -30,15 +30,21 @@ const obtenerPago = async (id: number) => {
 };
 
 // Un abono no puede superar lo que el alumno aún debe. Al editar, el propio
-// abono no cuenta contra su saldo (`excluirId`).
+// abono no cuenta contra su saldo (`excluirId`), y solo se valida si la edición
+// aumenta lo pagado del alumno: cambiar el método o bajar el monto de un alumno
+// sobrepagado debe poder hacerse.
 // ponytail: valida cada abono contra el saldo, no la suma de abonos aún sin
 // cobrar; si se necesita un plan de cuotas cerrado, validar contra precio − todos.
 const validarAbono = async (datos: NuevoPago, tx: Transaccion, excluirId?: number) => {
   const [cuenta] = await pagosRepository.cuentas(datos.id_alumno, tx);
   if (!cuenta) throw errorDeNegocio("Alumno no encontrado", 404);
-  const abonos = (await pagosRepository.listar(datos.id_alumno, tx)).filter(
-    (abono) => abono.id_pago !== excluirId,
-  );
+  const todos = await pagosRepository.listar(datos.id_alumno, tx);
+  // Lo que este abono ya aportaba al alumno destino (0 si era de otro alumno o no estaba pagado).
+  const previo = todos.find((abono) => abono.id_pago === excluirId);
+  const aportePrevio = previo?.estado === "pagado" ? aCentavos(previo.monto) : 0;
+  const aumentaLoPagado = datos.estado === "pagado" && aCentavos(datos.monto) > aportePrevio;
+  if (excluirId !== undefined && !aumentaLoPagado) return;
+  const abonos = todos.filter((abono) => abono !== previo);
   const { saldo_pendiente } = calcularSaldo(cuenta.precio, abonos, new Date());
   if (aCentavos(datos.monto) > aCentavos(saldo_pendiente)) {
     throw errorDeNegocio(

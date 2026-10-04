@@ -2,13 +2,14 @@ import { z } from "zod";
 import { fechaPayloadSchema } from "./fecha.js";
 
 const NUMERIC_10_2_MAX = 99_999_999.99;
+const INT4_MAX = 2_147_483_647;
 
 export const metodoPago = z.enum(["efectivo", "tarjeta", "transferencia"]);
 export const estadoPago = z.enum(["pagado", "pendiente", "vencido"]);
 export type EstadoPago = z.infer<typeof estadoPago>;
 
 const pagoPayloadSchema = z.object({
-  id_alumno: z.number().int().positive(),
+  id_alumno: z.number().int().positive().max(INT4_MAX),
   monto: z.number().positive().max(NUMERIC_10_2_MAX).multipleOf(0.01),
   fecha: fechaPayloadSchema,
   metodo: metodoPago,
@@ -16,7 +17,7 @@ const pagoPayloadSchema = z.object({
 });
 
 export const pagoSchema = pagoPayloadSchema.extend({
-  id_pago: z.number().int().positive(),
+  id_pago: z.number().int().positive().max(INT4_MAX),
   fecha: z.coerce.date(),
 });
 export type Pago = z.infer<typeof pagoSchema>;
@@ -37,13 +38,13 @@ export const actualizarPagoSchema = nuevoPagoSchema;
 export type ActualizarPago = z.infer<typeof actualizarPagoSchema>;
 
 export const listarPagosQuerySchema = z.object({
-  id_alumno: z.coerce.number().int().positive().optional(),
+  id_alumno: z.coerce.number().int().positive().max(INT4_MAX).optional(),
   estado: estadoPago.optional(),
 });
 export type ListarPagosQuery = z.infer<typeof listarPagosQuerySchema>;
 
 export const idPagoParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  id: z.coerce.number().int().positive().max(INT4_MAX),
 });
 
 // Cuenta por cobrar de un alumno: precio de su paquete menos lo ya pagado.
