@@ -119,12 +119,39 @@ test("PUT: el propio abono no cuenta contra su saldo", async () => {
   assert.equal(excede.statusCode, 409);
 });
 
+test("PUT en alumno sobrepagado: editar sin aumentar lo pagado → 200; aumentar sobre el saldo → 409", async () => {
+  pagos.push(fila(3, 200)); // 300 + 200 = 500 pagados sobre un precio de 450
+  const metodo = await pedir("PUT", "/api/pagos/3", { ...abono, monto: 200, metodo: "tarjeta" });
+  assert.equal(metodo.statusCode, 200);
+  const baja = await pedir("PUT", "/api/pagos/3", { ...abono, monto: 100 });
+  assert.equal(baja.statusCode, 200);
+  // Sin el abono 3 el saldo es 450 − 300 = 150.
+  const sube = await pedir("PUT", "/api/pagos/3", { ...abono, monto: 200.01 });
+  assert.equal(sube.statusCode, 409);
+  // Pasarlo a otro alumno suma a ese alumno (Luis, al día) → se valida.
+  const otro = await pedir("PUT", "/api/pagos/3", { ...abono, id_alumno: 2, monto: 200 });
+  assert.equal(otro.statusCode, 409);
+  assert.equal(pagosRepository.actualizar.mock.callCount(), 2);
+});
+
 test("pago inexistente → 404; id no numérico → 400", async () => {
   assert.equal((await pedir("GET", "/api/pagos/999")).statusCode, 404);
   assert.equal((await pedir("PUT", "/api/pagos/999", abono)).statusCode, 404);
   assert.equal((await pedir("DELETE", "/api/pagos/999")).statusCode, 404);
   assert.equal((await pedir("GET", "/api/pagos/abc")).statusCode, 400);
   assert.equal((await pedir("DELETE", "/api/pagos/0")).statusCode, 400);
+});
+
+test("ids fuera de int4 → 400, no 500", async () => {
+  const grande = 99999999999;
+  assert.equal((await pedir("GET", `/api/pagos/${grande}`)).statusCode, 400);
+  assert.equal((await pedir("PUT", `/api/pagos/${grande}`, abono)).statusCode, 400);
+  assert.equal((await pedir("DELETE", `/api/pagos/${grande}`)).statusCode, 400);
+  assert.equal((await pedir("GET", `/api/pagos/saldo/${grande}`)).statusCode, 400);
+  assert.equal((await pedir("GET", `/api/pagos?id_alumno=${grande}`)).statusCode, 400);
+  const post = await pedir("POST", "/api/pagos", { ...abono, id_alumno: grande });
+  assert.equal(post.statusCode, 400);
+  assert.equal(pagosRepository.transaccion.mock.callCount(), 0);
 });
 
 test("DELETE existente → 204", async () => {

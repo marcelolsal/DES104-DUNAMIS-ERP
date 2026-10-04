@@ -54,3 +54,11 @@ test("estadoEfectivo: pendiente vence al día siguiente de su fecha, no el mismo
   assert.equal(estadoEfectivo(abono(1, "pagado", "2020-01-01"), hoy), "pagado");
   assert.equal(estadoEfectivo(abono(1, "vencido", "2030-01-01"), hoy), "vencido");
 });
+
+test("estadoEfectivo: 'hoy' es el día en El Salvador (UTC−6), no en UTC", () => {
+  const pendienteHoy = abono(1, "pendiente", "2026-10-04");
+  // 20:00 del 4 en El Salvador = 02:00 del 5 en UTC → aún es el día del abono.
+  assert.equal(estadoEfectivo(pendienteHoy, new Date("2026-10-05T02:00:00Z")), "pendiente");
+  // 20:00 del 5 en El Salvador → ya pasó su fecha.
+  assert.equal(estadoEfectivo(pendienteHoy, new Date("2026-10-06T02:00:00Z")), "vencido");
+});
