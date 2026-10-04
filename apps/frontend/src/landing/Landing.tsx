@@ -166,17 +166,25 @@ const Cierre = () => (
   </>
 );
 
-const Landing = () => (
-  <div className="landing" id="inicio">
-    <Encabezado />
-    <main>
-      <Hero />
-      <Secciones />
-      <Cierre />
-    </main>
-    <footer className="landing-footer">
-      <span>Dunamis · Autoescuela</span>
-      <a href={LOGIN_HASH}>Acceso administrativo</a>
-    </footer>
-  </div>
-);
+const Landing = () => {
+  // Deep link (/#cursos): al cargar la sección aún no existía, así que se baja al montar.
+  // Solo ids simples; hashes como #access_token=... o #error=... se ignoran.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (/^[\w-]+$/.test(id)) document.getElementById(id)?.scrollIntoView();
+  }, []);
+  return (
+    <div className="landing" id="inicio">
+      <Encabezado />
+      <main>
+        <Hero />
+        <Secciones />
+        <Cierre />
+      </main>
+      <footer className="landing-footer">
+        <span>Dunamis · Autoescuela</span>
+        <a href={LOGIN_HASH}>Acceso administrativo</a>
+      </footer>
+    </div>
+  );
+};
