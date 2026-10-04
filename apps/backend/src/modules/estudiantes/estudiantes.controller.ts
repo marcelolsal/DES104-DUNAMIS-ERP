@@ -18,4 +18,11 @@ export const estudiantesController = {
 
   actualizar: async (req: FastifyRequest<{ Params: { id: string }; Body: NuevoAlumno }>) =>
     estudiantesService.actualizar(Number(req.params.id), req.body),
+
+  eliminar: async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return reply.code(400).send({ error: "Id inválido" });
+    await estudiantesService.eliminar(id);
+    return reply.code(204).send();
+  },
 };
