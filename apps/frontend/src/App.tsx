@@ -118,6 +118,8 @@ export const App = () => {
   }
 
   const handleLogout = async (): Promise<void> => {
+    // Quita el #login heredado para volver a la landing, no al formulario.
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
     const { error: logoutError } = await supabase.auth.signOut();
     if (logoutError) setError(logoutError.message);
   };
