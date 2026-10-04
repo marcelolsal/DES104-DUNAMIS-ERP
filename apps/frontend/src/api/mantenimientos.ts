@@ -1,4 +1,8 @@
-import type { ActualizarMantenimiento, Mantenimiento, NuevoMantenimiento } from "@dunamis/contracts";
+import type {
+  ActualizarMantenimiento,
+  Mantenimiento,
+  NuevoMantenimiento,
+} from "@dunamis/contracts";
 import { api } from "./client.js";
 
 export const mantenimientosApi = {
@@ -9,6 +13,10 @@ export const mantenimientosApi = {
   crear: (datos: NuevoMantenimiento): Promise<Mantenimiento> =>
     api<Mantenimiento>("/api/mantenimientos", { method: "POST", body: JSON.stringify(datos) }),
   actualizar: (id: number, datos: ActualizarMantenimiento): Promise<Mantenimiento> =>
-    api<Mantenimiento>(`/api/mantenimientos/${String(id)}`, { method: "PUT", body: JSON.stringify(datos) }),
-  eliminar: (id: number): Promise<undefined> => api<undefined>(`/api/mantenimientos/${String(id)}`, { method: "DELETE" }),
+    api<Mantenimiento>(`/api/mantenimientos/${String(id)}`, {
+      method: "PUT",
+      body: JSON.stringify(datos),
+    }),
+  eliminar: (id: number): Promise<undefined> =>
+    api<undefined>(`/api/mantenimientos/${String(id)}`, { method: "DELETE" }),
 };
