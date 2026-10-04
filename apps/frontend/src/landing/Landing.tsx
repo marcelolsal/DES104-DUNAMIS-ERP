@@ -25,16 +25,10 @@ const cursos = [
 
 const especialidades = ["Ciudad", "Autopista", "Nocturno", "Automático", "Mecánico"];
 
-// Mismo catálogo que apps/backend/src/shared/db/seed-data/paquete.jsonl.
-// ponytail: copia estática; leer de la API cuando exista un endpoint público de paquetes.
-const paquetes = [
-  { nombre: "Básico", horas: 20, precio: 600 },
-  { nombre: "Estándar", horas: 20, precio: 500 },
-  { nombre: "Intensivo", horas: 15, precio: 250 },
-  { nombre: "Premium", horas: 30, precio: 600 },
-  { nombre: "Express", horas: 25, precio: 600 },
-  { nombre: "Fin de semana", horas: 30, precio: 500 },
-];
+// Paquetes del catálogo semilla (apps/backend/src/shared/db/seed-data/paquete.jsonl).
+// ponytail: lista estática y sin importes; mostrar horas y precio reales cuando exista
+// un endpoint público de paquetes (hoy /api/paquetes exige sesión).
+const paquetes = ["Básico", "Estándar", "Intensivo", "Premium", "Express", "Fin de semana"];
 
 const suscribirHash = (onChange: () => void) => {
   window.addEventListener("hashchange", onChange);
@@ -123,7 +117,7 @@ const Secciones = () => (
     </section>
     <section className="landing-section" id="instructores" aria-labelledby="instructores-title">
       <p className="landing-kicker">Instructores</p>
-      <h2 id="instructores-title">Un instructor para cada tipo de manejo</h2>
+      <h2 id="instructores-title">Instructores por especialidad</h2>
       <p>Nuestros instructores se especializan en:</p>
       <ul className="landing-tags">
         {especialidades.map((especialidad) => (
@@ -134,14 +128,13 @@ const Secciones = () => (
     <section className="landing-section" id="precios" aria-labelledby="precios-title">
       <p className="landing-kicker">Precios</p>
       <h2 id="precios-title">Paquetes de clases</h2>
-      <p>Precios de referencia: confirma el paquete vigente al inscribirte.</p>
-      <ul className="landing-cards">
+      <p>
+        El precio depende del paquete y de sus horas de clase. Te lo detallamos al inscribirte y
+        puedes pagarlo por abonos.
+      </p>
+      <ul className="landing-tags">
         {paquetes.map((paquete) => (
-          <li key={paquete.nombre}>
-            <h3>{paquete.nombre}</h3>
-            <p>{paquete.horas} horas de clase</p>
-            <p className="landing-precio">${paquete.precio}</p>
-          </li>
+          <li key={paquete}>{paquete}</li>
         ))}
       </ul>
     </section>

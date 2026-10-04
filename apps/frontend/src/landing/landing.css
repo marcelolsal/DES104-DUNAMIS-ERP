@@ -196,12 +196,6 @@
   margin: 0 0 8px;
   font-size: 18px;
 }
-.landing-cards .landing-precio {
-  margin: 12px 0 0;
-  color: #ff6b00;
-  font-size: 30px;
-  font-weight: 900;
-}
 .landing-tags {
   display: flex;
   flex-wrap: wrap;
@@ -247,12 +241,12 @@
   color: #ff6b00;
 }
 
-@media (max-width: 860px) {
+/* El encabezado completo (marca + 5 enlaces + 2 botones) no cabe en una fila bajo ~1100px. */
+@media (max-width: 1100px) {
   .landing-header {
     position: static;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 16px;
   }
   .landing-nav {
     order: 3;
@@ -270,6 +264,12 @@
   }
   .landing-section {
     scroll-margin-top: 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .landing-header {
+    padding: 12px 16px;
   }
   .landing-hero {
     grid-template-columns: 1fr;
