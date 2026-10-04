@@ -127,6 +127,18 @@ test("pago inexistente → 404; id no numérico → 400", async () => {
   assert.equal((await pedir("DELETE", "/api/pagos/0")).statusCode, 400);
 });
 
+test("ids fuera de int4 → 400, no 500", async () => {
+  const grande = 99999999999;
+  assert.equal((await pedir("GET", `/api/pagos/${grande}`)).statusCode, 400);
+  assert.equal((await pedir("PUT", `/api/pagos/${grande}`, abono)).statusCode, 400);
+  assert.equal((await pedir("DELETE", `/api/pagos/${grande}`)).statusCode, 400);
+  assert.equal((await pedir("GET", `/api/pagos/saldo/${grande}`)).statusCode, 400);
+  assert.equal((await pedir("GET", `/api/pagos?id_alumno=${grande}`)).statusCode, 400);
+  const post = await pedir("POST", "/api/pagos", { ...abono, id_alumno: grande });
+  assert.equal(post.statusCode, 400);
+  assert.equal(pagosRepository.transaccion.mock.callCount(), 0);
+});
+
 test("DELETE existente → 204", async () => {
   assert.equal((await pedir("DELETE", "/api/pagos/1")).statusCode, 204);
   assert.deepEqual(pagosRepository.eliminar.mock.calls[0].arguments, [1]);
