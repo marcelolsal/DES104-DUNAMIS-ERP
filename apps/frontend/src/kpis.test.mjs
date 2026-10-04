@@ -28,6 +28,8 @@ test("validarRango: acepta un día y 366 días; rechaza vacío, invertido y más
   assert.equal(validarRango({ desde: "2026-10-04", hasta: "2026-10-04" }), null);
   assert.equal(validarRango({ desde: "2028-01-01", hasta: "2028-12-31" }), null); // 366
   assert.match(validarRango({ desde: "", hasta: "2026-10-04" }), /Selecciona/u);
+  assert.match(validarRango({ desde: "2026-02-31", hasta: "2026-03-05" }), /Selecciona/u);
+  assert.match(validarRango({ desde: "2026-01-01", hasta: "2026-13-01" }), /Selecciona/u);
   assert.match(validarRango({ desde: "2026-10-05", hasta: "2026-10-04" }), /posterior/u);
   assert.match(validarRango({ desde: "2026-01-01", hasta: "2027-01-02" }), /366/u);
 });

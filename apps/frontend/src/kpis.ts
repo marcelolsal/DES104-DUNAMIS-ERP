@@ -10,6 +10,11 @@ export interface Rango {
 // Mismo tope que reporteFinancieroQuerySchema (ambos extremos cuentan).
 const MAX_DIAS_RANGO = 366;
 const FECHA = /^\d{4}-\d{2}-\d{2}$/u;
+// Formato y día real (Date.parse normaliza 2026-02-31 a 03-03; el contrato lo rechaza).
+const esFecha = (fecha: string): boolean => {
+  const ms = Date.parse(fecha);
+  return FECHA.test(fecha) && !Number.isNaN(ms) && new Date(ms).toISOString().startsWith(fecha);
+};
 
 const diaEnElSalvador = new Intl.DateTimeFormat("en-CA", { timeZone: "America/El_Salvador" });
 
@@ -26,7 +31,7 @@ export const rangoDelMes = (ahora: Date): Rango => {
 
 // Devuelve el mensaje a mostrar, o null si el rango se puede pedir al backend.
 export const validarRango = ({ desde, hasta }: Rango): string | null => {
-  if (!FECHA.test(desde) || !FECHA.test(hasta)) return "Selecciona la fecha inicial y la final.";
+  if (!esFecha(desde) || !esFecha(hasta)) return "Selecciona la fecha inicial y la final.";
   if (desde > hasta) return "La fecha inicial no puede ser posterior a la final.";
   const dias = (Date.parse(hasta) - Date.parse(desde)) / 86_400_000 + 1;
   if (dias > MAX_DIAS_RANGO) return `El rango no puede superar ${String(MAX_DIAS_RANGO)} días.`;
