@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import type { NuevoAlumno } from "@dunamis/contracts";
 import { db } from "../../shared/db/client.js";
-import { alumno, clase, instructor, paquete } from "../../shared/db/schema.js";
+import { alumno, clase, instructor, pago, paquete } from "../../shared/db/schema.js";
 
 // Única capa que toca la BD (Drizzle). ADR-0004.
 export const estudiantesRepository = {
@@ -50,4 +50,15 @@ export const estudiantesRepository = {
       .where(eq(alumno.id_alumno, id))
       .returning()
       .then((r) => r[0] ?? null),
+
+  // Tablas que referencian al alumno por FK: clase y pago.
+  tieneDependencias: async (id: number) => {
+    const [clases, pagos] = await Promise.all([
+      db.select({ id: clase.id_clase }).from(clase).where(eq(clase.id_alumno, id)).limit(1),
+      db.select({ id: pago.id_pago }).from(pago).where(eq(pago.id_alumno, id)).limit(1),
+    ]);
+    return clases.length > 0 || pagos.length > 0;
+  },
+
+  eliminar: (id: number) => db.delete(alumno).where(eq(alumno.id_alumno, id)),
 };

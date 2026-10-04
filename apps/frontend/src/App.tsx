@@ -8,6 +8,7 @@ import type { Session } from "@supabase/supabase-js";
 import { MantenimientosPanel } from "./components/MantenimientosPanel.js";
 import { PaquetesPanel } from "./components/PaquetesPanel.js";
 import { VehiculosPanel } from "./components/VehiculosPanel.js";
+import { ClasesPage } from "./components/ClasesPage.js";
 import "./app.css";
 import "./students.css";
 
@@ -40,7 +41,7 @@ function formFromStudent(student: EstudianteListado): NuevoAlumno {
   };
 }
 
-type Seccion = "estudiantes" | "paquetes" | "vehiculos" | "mantenimientos";
+type Seccion = "estudiantes" | "paquetes" | "vehiculos" | "mantenimientos" | "clases";
 
 export const App = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -136,15 +137,16 @@ export const App = () => {
         <div className="students-user"><strong>{session.user.email}</strong><button onClick={handleLogout} type="button">Cerrar sesión</button></div>
       </header>
       <nav className="tabs" aria-label="Módulos">
-        {(["estudiantes", "paquetes", "vehiculos", "mantenimientos"] as Seccion[]).map((item) => (
+        {(["estudiantes", "paquetes", "vehiculos", "mantenimientos", "clases"] as Seccion[]).map((item) => (
           <button className={seccion === item ? "active" : undefined} key={item} type="button" onClick={() => { setSeccion(item); }}>
-            {item[0]?.toUpperCase()}{item.slice(1)}
+            {item === "clases" ? "Clases" : item[0]?.toUpperCase() + item.slice(1)}
           </button>
         ))}
       </nav>
       {seccion === "paquetes" && <PaquetesPanel />}
       {seccion === "vehiculos" && <VehiculosPanel />}
       {seccion === "mantenimientos" && <MantenimientosPanel />}
+      {seccion === "clases" && <ClasesPage />}
       {seccion === "estudiantes" && <section className="students-content">
         <div className="students-heading">
           <div><p className="section-kicker">GESTIÓN</p><h1>ESTUDIANTES</h1></div>
