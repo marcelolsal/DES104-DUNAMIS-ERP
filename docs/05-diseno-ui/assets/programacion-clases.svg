@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000">
+  <defs>
+    <linearGradient id="canvas" x2="0" y2="1"><stop stop-color="#090d16"/><stop offset="1" stop-color="#03050b"/></linearGradient>
+    <linearGradient id="accent" x2="1" y2="1"><stop stop-color="#ff8a1c"/><stop offset="1" stop-color="#ff5f00"/></linearGradient>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".25"/></filter>
+    <style>
+      text{font-family:Arial,Helvetica,sans-serif}.white{fill:#f5f5f6}.subtle{fill:#798297}.orange{fill:#ff7512}.eyebrow{font-size:10px;letter-spacing:2.5px;font-weight:700}.label{font-size:11px;letter-spacing:1.4px}.body{font-size:13px}.small{font-size:11px}.heading{font-size:39px;font-weight:900;letter-spacing:-1.8px}.line{stroke:#202735;stroke-width:1}.card{fill:#0d121d;stroke:#272f3d;stroke-width:1}.event{fill:#151a2b;stroke:#8060ce;stroke-width:2}
+    </style>
+  </defs>
+  <rect width="1440" height="1000" fill="url(#canvas)"/>
+  <!-- Header -->
+  <rect width="1440" height="76" fill="#050609"/><path d="M0 75.5h1440" class="line"/>
+  <rect x="42" y="20" width="36" height="36" rx="2" fill="url(#accent)"/><path d="M49 44h22l-2-11H51zm5-11 2-6h8l3 6m-14 12v4m13-4v4" fill="none" stroke="#12141a" stroke-width="1.8" stroke-linejoin="round"/>
+  <text x="88" y="45" class="white" font-size="17" font-weight="900" letter-spacing="2">DUNA<tspan class="orange">MIS</tspan></text>
+  <text x="239" y="44" class="subtle eyebrow">PANEL ADMINISTRATIVO</text>
+  <text x="1191" y="37" class="white body" text-anchor="end" font-weight="700">Admin</text><text x="1191" y="55" class="subtle small" text-anchor="end">Administrador</text><rect x="1209" y="19" width="38" height="38" fill="#ff6b00"/><text x="1228" y="44" fill="#11131a" font-size="15" font-weight="800" text-anchor="middle">A</text>
+  <!-- Title and primary action -->
+  <text x="48" y="128" class="subtle eyebrow">GESTIÓN ACADÉMICA</text>
+  <text x="48" y="178" class="white heading">PROGRAMACIÓN DE CLASES</text>
+  <text x="49" y="204" class="subtle body">Agenda semanal · Asigna alumno, instructor y vehículo</text>
+  <rect x="1115" y="133" width="277" height="52" rx="2" fill="url(#accent)" filter="url(#cardShadow)"/><text x="1253" y="165" fill="#0c0d11" font-size="12" font-weight="900" letter-spacing="1.3" text-anchor="middle">+ PROGRAMAR CLASE</text>
+  <!-- Toolbar -->
+  <rect x="48" y="229" width="1344" height="68" rx="3" class="card"/>
+  <rect x="66" y="243" width="196" height="40" rx="2" fill="#090d16" stroke="#303847"/><text x="82" y="268" class="white body">Instructor · Todos</text><path d="m239 259 5 5 5-5" fill="none" stroke="#8991a1" stroke-width="1.4"/>
+  <rect x="275" y="243" width="196" height="40" rx="2" fill="#090d16" stroke="#303847"/><text x="291" y="268" class="white body">Vehículo · Todos</text><path d="m448 259 5 5 5-5" fill="none" stroke="#8991a1" stroke-width="1.4"/>
+  <rect x="484" y="243" width="190" height="40" rx="2" fill="#090d16" stroke="#303847"/><text x="500" y="268" class="white body">Estado · Todas</text><path d="m650 259 5 5 5-5" fill="none" stroke="#8991a1" stroke-width="1.4"/>
+  <rect x="1098" y="243" width="276" height="40" rx="2" fill="#090d16" stroke="#303847"/><circle cx="1119" cy="262" r="6" fill="none" stroke="#8590a2" stroke-width="1.4"/><path d="m1123 266 5 5" stroke="#8590a2" stroke-width="1.4"/><text x="1138" y="267" class="subtle body">Buscar alumno...</text>
+  <!-- Calendar controls -->
+  <text x="48" y="344" class="white" font-size="18" font-weight="800">AGENDA SEMANAL</text>
+  <rect x="48" y="361" width="88" height="36" rx="2" fill="#111722" stroke="#343c4a"/><text x="92" y="384" class="white small" text-anchor="middle" font-weight="700">HOY</text>
+  <rect x="146" y="361" width="36" height="36" rx="2" fill="#111722" stroke="#343c4a"/><path d="m168 372-7 7 7 7" fill="none" stroke="#d8dbe2" stroke-width="1.6"/>
+  <rect x="190" y="361" width="36" height="36" rx="2" fill="#111722" stroke="#343c4a"/><path d="m204 372 7 7-7 7" fill="none" stroke="#d8dbe2" stroke-width="1.6"/>
+  <text x="242" y="384" class="white body" font-weight="700">10 — 16 AGO 2026</text>
+  <rect x="1150" y="361" width="105" height="36" fill="#ff6b00"/><text x="1202" y="384" fill="#0b0c10" class="small" font-weight="800" text-anchor="middle">SEMANA</text><rect x="1255" y="361" width="105" height="36" fill="#101520" stroke="#343c4a"/><text x="1307" y="384" class="subtle small" text-anchor="middle">MES</text>
+  <!-- Calendar frame, columns -->
+  <rect x="48" y="414" width="1344" height="480" rx="3" fill="#080c14" stroke="#252d3b"/>
+  <rect x="48" y="414" width="1344" height="60" fill="#0d121d"/>
+  <path d="M122 414v480M303 414v480M484 414v480M665 414v480M846 414v480M1027 414v480M1208 414v480" class="line"/>
+  <path d="M48 474h1344M48 544h1344M48 614h1344M48 684h1344M48 754h1344M48 824h1344" class="line"/>
+  <text x="85" y="450" class="subtle eyebrow" text-anchor="middle">HORA</text>
+  <g class="subtle eyebrow" text-anchor="middle"><text x="212" y="439">LUN</text><text x="393" y="439">MAR</text><text x="574" y="439">MIÉ</text><text x="755" y="439">JUE</text><text x="936" y="439">VIE</text><text x="1117" y="439">SÁB</text><text x="1298" y="439">DOM</text></g>
+  <g class="white small" font-weight="700" text-anchor="middle"><text x="212" y="459">10 AGO</text><text x="393" y="459">11 AGO</text><text x="574" y="459">12 AGO</text><text x="755" y="459">13 AGO</text><text x="936" y="459">14 AGO</text><text x="1117" y="459">15 AGO</text><text x="1298" y="459">16 AGO</text></g>
+  <g class="subtle small" text-anchor="middle"><text x="85" y="516">08:00</text><text x="85" y="586">09:00</text><text x="85" y="656">10:00</text><text x="85" y="726">11:00</text><text x="85" y="796">12:00</text><text x="85" y="866">13:00</text></g>
+  <!-- Class cards -->
+  <g filter="url(#cardShadow)">
+    <rect x="135" y="486" width="156" height="50" rx="3" class="event"/><text x="146" y="503" fill="#cfbaff" font-size="10" font-weight="700">08:15 — 09:15</text><text x="146" y="519" class="white small" font-weight="700">Ana García</text><text x="146" y="531" class="subtle" font-size="9">M. Torres · P-204</text>
+    <rect x="316" y="556" width="156" height="50" rx="3" class="event"/><text x="327" y="573" fill="#cfbaff" font-size="10" font-weight="700">09:15 — 10:15</text><text x="327" y="589" class="white small" font-weight="700">Carlos Méndez</text><text x="327" y="601" class="subtle" font-size="9">S. Oliveira · P-118</text>
+    <rect x="497" y="626" width="156" height="50" rx="3" class="event"/><text x="508" y="643" fill="#cfbaff" font-size="10" font-weight="700">10:15 — 11:15</text><text x="508" y="659" class="white small" font-weight="700">Valentina Torres</text><text x="508" y="671" class="subtle" font-size="9">D. Park · P-450</text>
+    <rect x="678" y="486" width="156" height="50" rx="3" class="event"/><text x="689" y="503" fill="#cfbaff" font-size="10" font-weight="700">08:15 — 09:15</text><text x="689" y="519" class="white small" font-weight="700">Diego Ramírez</text><text x="689" y="531" class="subtle" font-size="9">M. Torres · P-204</text>
+    <rect x="859" y="696" width="156" height="50" rx="3" class="event"/><text x="870" y="713" fill="#cfbaff" font-size="10" font-weight="700">11:15 — 12:15</text><text x="870" y="729" class="white small" font-weight="700">Sofía Herrera</text><text x="870" y="741" class="subtle" font-size="9">D. Park · P-322</text>
+    <rect x="1040" y="556" width="156" height="50" rx="3" class="event"/><text x="1051" y="573" fill="#cfbaff" font-size="10" font-weight="700">09:15 — 10:15</text><text x="1051" y="589" class="white small" font-weight="700">María Juárez</text><text x="1051" y="601" class="subtle" font-size="9">S. Oliveira · P-118</text>
+  </g>
+  <!-- Footer legend and conflict guidance -->
+  <rect x="49" y="924" width="10" height="10" fill="#8060ce"/><text x="66" y="934" class="subtle small">CLASE PROGRAMADA</text><rect x="222" y="924" width="10" height="10" fill="#ff6b00"/><text x="239" y="934" class="subtle small">FRANJA SELECCIONADA</text><text x="476" y="934" class="subtle small">Duración predeterminada: 60 min · Se notifican solapes de instructor o vehículo.</text><text x="1390" y="934" class="orange eyebrow" text-anchor="end">DUNAMIS / DRIVEPRO</text>
+</svg>
