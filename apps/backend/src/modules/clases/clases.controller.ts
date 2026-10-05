@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import type { NuevoClase } from "@dunamis/contracts";
+import { idClaseParamsSchema, type NuevoClase } from "@dunamis/contracts";
 import { clasesService } from "./clases.service.js";
 
 // Traduce HTTP ↔ negocio. No toca la BD.
@@ -12,7 +12,7 @@ export const clasesController = {
   listarOpciones: async () => clasesService.listarOpciones(),
 
   obtener: async (req: FastifyRequest<{ Params: { id: string } }>) =>
-    clasesService.obtener(Number(req.params.id)),
+    clasesService.obtener(idClaseParamsSchema.parse(req.params).id),
 
   crear: async (req: FastifyRequest<{ Body: NuevoClase }>, reply: FastifyReply) => {
     const clase = await clasesService.crear(req.body);
@@ -20,10 +20,10 @@ export const clasesController = {
   },
 
   actualizar: async (req: FastifyRequest<{ Params: { id: string }; Body: NuevoClase }>) =>
-    clasesService.actualizar(Number(req.params.id), req.body),
+    clasesService.actualizar(idClaseParamsSchema.parse(req.params).id, req.body),
 
   eliminar: async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    await clasesService.eliminar(Number(req.params.id));
+    await clasesService.eliminar(idClaseParamsSchema.parse(req.params).id);
     return reply.code(204).send();
   },
 };

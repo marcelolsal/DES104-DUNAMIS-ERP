@@ -34,19 +34,23 @@ export const estudiantesRepository = {
   listarPaquetes: () => db.select().from(paquete),
 
   obtener: (id: number) =>
-    db.select().from(alumno).where(eq(alumno.id_alumno, id)).then((r) => r[0] ?? null),
+    db
+      .select()
+      .from(alumno)
+      .where(eq(alumno.id_alumno, id))
+      .then((r) => r[0] ?? null),
 
   crear: (datos: NuevoAlumno) =>
     db
       .insert(alumno)
-      .values({ ...datos, fecha_inscripcion: datos.fecha_inscripcion.toISOString().slice(0, 10) })
+      .values(datos)
       .returning()
       .then((r) => r[0]!),
 
   actualizar: (id: number, datos: NuevoAlumno) =>
     db
       .update(alumno)
-      .set({ ...datos, fecha_inscripcion: datos.fecha_inscripcion.toISOString().slice(0, 10) })
+      .set(datos)
       .where(eq(alumno.id_alumno, id))
       .returning()
       .then((r) => r[0] ?? null),

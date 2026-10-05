@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { fechaPayloadSchema } from "./fecha.js";
+
+const INT4_MAX = 2_147_483_647;
 
 export const alumnoSchema = z.object({
   id_alumno: z.number().int().positive(),
@@ -12,8 +15,12 @@ export const alumnoSchema = z.object({
 });
 export type Alumno = z.infer<typeof alumnoSchema>;
 
-// Payload de creación: sin id (lo genera la BD).
-export const nuevoAlumnoSchema = alumnoSchema.omit({ id_alumno: true });
+// Payload de creación: sin id (lo genera la BD). La fecha va como YYYY-MM-DD
+// (columna `date`): un Date pasaría por UTC y correría el día después de las 18:00 en SV.
+export const nuevoAlumnoSchema = alumnoSchema.omit({ id_alumno: true }).extend({
+  fecha_inscripcion: fechaPayloadSchema,
+  id_paquete: z.number().int().positive().max(INT4_MAX),
+});
 export type NuevoAlumno = z.infer<typeof nuevoAlumnoSchema>;
 
 export const estadoAlumno = z.enum(["Activo", "Graduado"]);
@@ -35,3 +42,8 @@ export const estudianteListadoSchema = z.object({
   estado: estadoAlumno,
 });
 export type EstudianteListado = z.infer<typeof estudianteListadoSchema>;
+
+// Ids de ruta: solo dígitos (z.coerce aceptaría "0x10" o "1e3") y dentro de int4.
+export const idAlumnoParamsSchema = z.object({
+  id: z.string().regex(/^\d+$/u).pipe(z.coerce.number().int().positive().max(INT4_MAX)),
+});
