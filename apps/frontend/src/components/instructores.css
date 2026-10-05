@@ -40,6 +40,9 @@
   margin: 0;
   overflow-wrap: anywhere;
 }
+.inst-antiguedad {
+  margin-top: 6px;
+}
 .inst-contacto a {
   color: inherit;
   text-decoration: none;

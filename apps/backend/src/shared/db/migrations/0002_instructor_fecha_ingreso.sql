@@ -1,0 +1,1 @@
+ALTER TABLE "instructor" ADD COLUMN "fecha_ingreso" date;

@@ -135,6 +135,11 @@ export const InstructoresPanel = (): ReactNode => {
                   <span aria-hidden="true">☎</span>{" "}
                   <a href={`tel:${instructor.telefono}`}>{instructor.telefono}</a>
                 </p>
+                {instructor.fecha_ingreso && (
+                  <p className="inst-contacto inst-antiguedad">
+                    Desde {new Date(instructor.fecha_ingreso).getUTCFullYear()}
+                  </p>
+                )}
                 <dl className="inst-metricas">
                   <div>
                     <dt>Estudiantes</dt>

@@ -13,11 +13,17 @@ interface Props {
   onSaved: (mensaje: string) => void;
 }
 
+type CampoTexto = "nombre" | "especialidad" | "telefono";
+
 export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactNode => {
-  const [formulario, setFormulario] = useState<NuevoInstructor>(() => ({
+  const [formulario, setFormulario] = useState(() => ({
     nombre: instructor?.nombre ?? "",
     especialidad: instructor?.especialidad ?? "",
     telefono: instructor?.telefono ?? "",
+    // La fecha llega a medianoche UTC: su parte de fecha en UTC es la de calendario.
+    fecha_ingreso: instructor?.fecha_ingreso
+      ? new Date(instructor.fecha_ingreso).toISOString().slice(0, 10)
+      : "",
   }));
   const [error, setError] = useState<string>();
   const [guardando, setGuardando] = useState(false);
@@ -50,6 +56,7 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
       nombre: formulario.nombre.trim(),
       especialidad: formulario.especialidad.trim(),
       telefono: formulario.telefono.trim(),
+      fecha_ingreso: formulario.fecha_ingreso || null,
     };
     try {
       if (instructor) await instructoresApi.actualizar(instructor.id_instructor, datos);
@@ -63,7 +70,7 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
     }
   };
 
-  const campo = (nombre: keyof NuevoInstructor, etiqueta: string, maximo: number) => (
+  const campo = (nombre: CampoTexto, etiqueta: string, maximo: number) => (
     <label>
       {etiqueta}
       <input
@@ -102,6 +109,17 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
           {campo("nombre", "Nombre", 160)}
           {campo("especialidad", "Especialidad", 120)}
           {campo("telefono", "Teléfono", 30)}
+          <label>
+            Fecha de ingreso (opcional)
+            <input
+              max={new Date().toLocaleDateString("en-CA")}
+              type="date"
+              value={formulario.fecha_ingreso}
+              onChange={(event) => {
+                setFormulario({ ...formulario, fecha_ingreso: event.target.value });
+              }}
+            />
+          </label>
           <ApiMessage error={error} />
           <div className="modal-actions">
             <button className="secondary-button" type="button" onClick={onClose}>
