@@ -1,0 +1,160 @@
+/* Panel de KPIs financieros. Todo con prefijo .kpis- */
+.kpis-page {
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 46px 3vw;
+}
+.kpis-eyebrow {
+  color: #768197;
+  font-size: 11px;
+  letter-spacing: 0.36em;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+}
+.kpis-page h2 {
+  color: #f7f8fc;
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  margin: 0 0 30px;
+  text-transform: uppercase;
+}
+.kpis-filtros {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.kpis-filtros label {
+  color: #8c95aa;
+  display: grid;
+  font-size: 11px;
+  font-weight: 700;
+  gap: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.kpis-filtros input {
+  background: #0c101a;
+  border: 1px solid #292f3d;
+  color: #e6e8ec;
+  color-scheme: dark;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: normal;
+  padding: 12px 14px;
+}
+.kpis-filtros input:focus-visible,
+.kpis-filtros button:focus-visible {
+  outline: 2px solid #ff6b00;
+  outline-offset: 2px;
+}
+.kpis-filtros button {
+  background: #ff6b00;
+  border: 0;
+  border-radius: 0;
+  color: #090b10;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 14px 22px;
+  text-transform: uppercase;
+}
+.kpis-filtros button:hover {
+  background: #ff8126;
+}
+.kpis-aviso {
+  color: #ff927c;
+  margin: 14px 0 0;
+}
+.kpis-periodo {
+  color: #8a92a4;
+  font-size: 13px;
+  margin: 22px 0 14px;
+}
+.kpis-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.kpis-grid[aria-busy="true"] {
+  opacity: 0.55;
+}
+.kpis-card {
+  background: #0a0e17;
+  border: 1px solid #303746;
+  min-width: 0;
+  padding: 24px 22px;
+}
+.kpis-titulo {
+  color: #8c95aa;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+}
+.kpis-valor {
+  color: #f4f4f5;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 900;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.kpis-detalle {
+  color: #8a92a4;
+  font-size: 12px;
+  margin: 10px 0 0;
+}
+.kpis-card--verde {
+  background: #04151a;
+  border-color: #0f5047;
+}
+.kpis-card--verde .kpis-valor {
+  color: #00d69b;
+}
+.kpis-card--amarillo {
+  background: #15130b;
+  border-color: #5a4a12;
+}
+.kpis-card--amarillo .kpis-valor {
+  color: #ffc21a;
+}
+.kpis-card--rojo {
+  background: #170b12;
+  border-color: #5c1d2b;
+}
+.kpis-card--rojo .kpis-valor {
+  color: #ff5f6d;
+}
+.kpis-vacio {
+  color: #8a92a4;
+  margin: 16px 0 0;
+}
+.kpis-subtitulo {
+  color: #f4f4f5;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  margin: 40px 0 6px;
+  text-transform: uppercase;
+}
+.kpis-nota {
+  color: #8a92a4;
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+@media (max-width: 700px) {
+  .kpis-page {
+    padding-top: 32px;
+  }
+  .kpis-filtros label {
+    flex: 1 1 140px;
+  }
+  .kpis-filtros input {
+    width: 100%;
+  }
+  .kpis-filtros button {
+    flex: 1 1 100%;
+  }
+}

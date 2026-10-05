@@ -11,6 +11,7 @@ import { PaquetesPanel } from "./components/PaquetesPanel.js";
 import { VehiculosPanel } from "./components/VehiculosPanel.js";
 import { ClasesPage } from "./components/ClasesPage.js";
 import { PagosPage } from "./components/PagosPage.js";
+import { KpisPanel } from "./components/KpisPanel.js";
 import "./app.css";
 import "./students.css";
 
@@ -43,7 +44,7 @@ function formFromStudent(student: EstudianteListado): NuevoAlumno {
   };
 }
 
-type Seccion = "estudiantes" | "instructores" | "paquetes" | "vehiculos" | "mantenimientos" | "clases" | "pagos";
+type Seccion = "estudiantes" | "instructores" | "paquetes" | "vehiculos" | "mantenimientos" | "clases" | "pagos" | "finanzas";
 
 export const App = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -153,7 +154,7 @@ export const App = () => {
         <div className="students-user"><strong>{session.user.email}</strong><button onClick={handleLogout} type="button">Cerrar sesión</button></div>
       </header>
       <nav className="tabs" aria-label="Módulos">
-        {(["estudiantes", "instructores", "paquetes", "vehiculos", "mantenimientos", "clases", "pagos"] as Seccion[]).map((item) => (
+        {(["estudiantes", "instructores", "paquetes", "vehiculos", "mantenimientos", "clases", "pagos", "finanzas"] as Seccion[]).map((item) => (
           <button className={seccion === item ? "active" : undefined} key={item} type="button" onClick={() => { setSeccion(item); }}>
             {item === "clases" ? "Clases" : item[0]?.toUpperCase() + item.slice(1)}
           </button>
@@ -165,6 +166,7 @@ export const App = () => {
       {seccion === "mantenimientos" && <MantenimientosPanel />}
       {seccion === "clases" && <ClasesPage />}
       {seccion === "pagos" && <PagosPage />}
+      {seccion === "finanzas" && <KpisPanel />}
       {seccion === "estudiantes" && <section className="students-content">
         <div className="students-heading">
           <div><p className="section-kicker">GESTIÓN</p><h1>ESTUDIANTES</h1></div>

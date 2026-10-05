@@ -27,7 +27,12 @@ export const api = async <T>(path: string, init: RequestInit = {}): Promise<T> =
     throw new Error("La sesión expiró. Inicia sesión nuevamente.");
   }
 
-  if (!res.ok) throw new Error(`API ${String(res.status)}: ${await res.text()}`);
+  // Solo cuerpos JSON llegan al mensaje; un HTML de proxy (502, etc.) no se muestra.
+  if (!res.ok) {
+    const cuerpo = await res.text();
+    const esJson = (res.headers.get("Content-Type") ?? "").includes("json");
+    throw new Error(`API ${String(res.status)}: ${esJson ? cuerpo : "Error del servidor"}`);
+  }
   if (res.status === 204) return undefined as unknown as T;
   return res.json() as Promise<T>;
 };
