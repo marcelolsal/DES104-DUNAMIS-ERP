@@ -29,8 +29,10 @@ hacer desde la interfaz.
    la página). Aparece el **Panel administrativo** («Bienvenido de vuelta»).
    **← Volver al inicio** regresa a la página pública.
 3. Escribe tu **correo electrónico** y tu **contraseña** (mínimo 6 caracteres).
-4. Pulsa **INICIAR SESION**. Si los datos son incorrectos, el mensaje de error
-   aparece debajo del formulario.
+4. Pulsa **INICIAR SESION**. Si los datos son incorrectos, aparece el mensaje
+   de error entre la contraseña y el botón **INICIAR SESION**. El texto viene
+   tal cual del servicio de autenticación, en inglés (p. ej. «Invalid login
+   credentials»).
 
 - No hay registro desde la pantalla: las cuentas las crea el administrador del
   sistema.
@@ -44,7 +46,9 @@ Una vez dentro, la barra de pestañas muestra los módulos: **Estudiantes**,
 **Pagos** y **Finanzas** (reportes y KPIs). Al entrar se abre Estudiantes.
 
 - Los avisos de éxito (verde) o de error (rojo) aparecen arriba del contenido
-  del módulo.
+  del módulo; los errores al guardar un formulario en ventana aparecen dentro de
+  ella. En **Estudiantes** es distinto: el error al guardar se muestra en la
+  página, detrás de la ventana.
 - Las eliminaciones siempre piden confirmación antes de ejecutarse.
 
 ## 3. Estudiantes
@@ -61,6 +65,9 @@ completadas con barra de progreso, **estado** y fecha de **ingreso**.
 El estado y el progreso se calculan solos: cada clase marcada como impartida
 suma una hora; al completar las horas del paquete el estudiante pasa a
 **Graduado**.
+
+> Como la agenda todavía no permite marcar clases como impartidas, las horas,
+> el progreso y el estado solo cambian con datos cargados fuera de la pantalla.
 
 ### Inscribir un estudiante
 
@@ -165,8 +172,10 @@ se pueden **editar** y **eliminar** registros.
 
 ### Programar una clase
 
-1. Pulsa **+ PROGRAMAR CLASE** (propone la siguiente hora libre) o haz clic en
-   una celda vacía de la agenda (usa ese día y hora).
+1. Pulsa **+ PROGRAMAR CLASE** o haz clic en una celda vacía de la agenda (usa
+   ese día y hora). El botón propone la siguiente hora en punto dentro del
+   horario de 07:00 a 18:00, sin revisar disponibilidad; si choca con otra
+   clase, el sistema avisa al guardar.
 2. Elige **Estudiante**, **Instructor** y **Vehículo**. Los vehículos en
    mantenimiento o de baja aparecen deshabilitados.
 3. Ajusta **Fecha y hora** si hace falta y pulsa **GUARDAR CLASE**.
@@ -194,6 +203,9 @@ Cada instructor aparece en una tarjeta con su **nombre**, **especialidad**,
 - **Horas impartidas:** clases marcadas como impartidas multiplicadas por la
   duración de la clase (60 minutos por defecto).
 
+> Como la agenda todavía no permite marcar clases como impartidas, las horas
+> impartidas solo cambian con datos cargados fuera de la pantalla.
+
 Mientras las métricas cargan se ve «…»; si no se pudieron obtener aparece «—» y
 el aviso «No se pudieron cargar las métricas.».
 
@@ -207,8 +219,9 @@ el aviso «No se pudieron cargar las métricas.».
    tecla **Esc**.
 
 - La fecha de ingreso **no puede ser futura**: el calendario no deja elegir
-  días posteriores a hoy y, si se envía igual, el sistema responde «La fecha de
-  ingreso no puede ser futura». Para quitarla, borra el campo y guarda.
+  días posteriores a hoy y, si se envía igual, el sistema responde «Datos
+  inválidos — fecha_ingreso: La fecha de ingreso no puede ser futura». Para
+  quitarla, borra el campo y guarda.
 
 ### Eliminar
 
@@ -222,13 +235,13 @@ cobrar.
 
 ### Estados de un abono
 
-| Estado | Significado |
-|--------|-------------|
-| **Pagado** | Dinero ya recibido. Descuenta del saldo del estudiante. |
+| Estado        | Significado                                                                           |
+| ------------- | ------------------------------------------------------------------------------------- |
+| **Pagado**    | Dinero ya recibido. Descuenta del saldo del estudiante.                               |
 | **Pendiente** | Abono acordado, aún no cobrado, con fecha de hoy en adelante. No descuenta del saldo. |
-| **Vencido** | Abono pendiente cuya fecha ya pasó. |
+| **Vencido**   | Abono pendiente cuya fecha ya pasó.                                                   |
 
-«Vencido» no se elige ni se guarda: el sistema lo calcula solo a partir de un
+«Vencido» no se elige al registrar: el sistema lo calcula solo a partir de un
 abono **Pendiente** con fecha pasada (según la fecha de El Salvador). Al
 registrar o editar solo se elige entre **Pagado** y **Pendiente**.
 
@@ -274,6 +287,8 @@ cuenta.
   y guarda («Pago actualizado.»). Al editar, el saldo indica «(ya descuenta este
   pago)» si el abono ya estaba pagado. La validación del saldo solo se aplica si
   la edición aumenta lo pagado por el estudiante.
+- Si el saldo del alumno ya está cubierto, pasar un abono vencido a **Pagado**
+  será rechazado; en ese caso elimina el abono vencido.
 - **ELIMINAR** pide confirmación y borra el abono («Pago eliminado.»).
 
 ## 10. Reportes y KPIs
@@ -287,11 +302,11 @@ La pestaña **Finanzas** muestra el panel **Indicadores**.
 
 El rango incluye ambos días y se valida antes de consultar:
 
-| Mensaje | Causa |
-|---------|-------|
-| Selecciona la fecha inicial y la final. | Falta una de las fechas o no es válida. |
-| La fecha inicial no puede ser posterior a la final. | «Desde» es mayor que «Hasta». |
-| El rango no puede superar 366 días. | El periodo es mayor a un año. |
+| Mensaje                                             | Causa                                   |
+| --------------------------------------------------- | --------------------------------------- |
+| Selecciona la fecha inicial y la final.             | Falta una de las fechas o no es válida. |
+| La fecha inicial no puede ser posterior a la final. | «Desde» es mayor que «Hasta».           |
+| El rango no puede superar 366 días.                 | El periodo es mayor a un año.           |
 
 ### Indicadores del periodo
 
@@ -344,15 +359,15 @@ en línea ni muestra datos de la base de datos.
 
 ## 12. Mensajes y errores frecuentes
 
-| Mensaje | Qué significa / qué hacer |
-|---------|---------------------------|
-| No se puede eliminar un paquete asignado a alumnos | Hay estudiantes con ese paquete. Cámbiales el curso antes de eliminarlo. |
-| No se puede eliminar un vehículo con clases o mantenimientos asociados | Tiene historial. Márcalo como **De baja** en lugar de eliminarlo. |
-| No se puede eliminar un instructor con clases asociadas | Tiene clases registradas; no se puede borrar. |
-| La fecha de ingreso no puede ser futura | Elige una fecha de ingreso de hoy o anterior, o déjala vacía. |
-| El abono de X excede el saldo pendiente del alumno (Y) | Registra un monto igual o menor al saldo indicado. |
-| El rango no puede superar 366 días | Acorta el periodo de Finanzas a un año como máximo. |
-| Ya existe un vehículo con esa placa | La placa ya está registrada. Revisa el listado. |
-| Solape: el instructor / el vehículo ya tiene una clase en esa franja | Cambia la hora, el instructor o el vehículo. |
-| Mensaje con nombres de campos (p. ej. `correo: ...`) | Algún dato no tiene el formato esperado. Corrige el campo indicado. |
-| Error al iniciar sesión | Correo o contraseña incorrectos, o la cuenta no existe. |
+| Mensaje                                                                  | Qué significa / qué hacer                                                |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| No se puede eliminar un paquete asignado a alumnos                       | Hay estudiantes con ese paquete. Cámbiales el curso antes de eliminarlo. |
+| No se puede eliminar un vehículo con clases o mantenimientos asociados   | Tiene historial. Márcalo como **De baja** en lugar de eliminarlo.        |
+| No se puede eliminar un instructor con clases asociadas                  | Tiene clases registradas; no se puede borrar.                            |
+| Datos inválidos — fecha_ingreso: La fecha de ingreso no puede ser futura | Elige una fecha de ingreso de hoy o anterior, o déjala vacía.            |
+| El abono de X excede el saldo pendiente del alumno (Y)                   | Registra un monto igual o menor al saldo indicado.                       |
+| El rango no puede superar 366 días                                       | Acorta el periodo de Finanzas a un año como máximo.                      |
+| Ya existe un vehículo con esa placa                                      | La placa ya está registrada. Revisa el listado.                          |
+| Solape: el instructor / el vehículo ya tiene una clase en esa franja     | Cambia la hora, el instructor o el vehículo.                             |
+| Mensaje con nombres de campos (p. ej. `correo: ...`)                     | Algún dato no tiene el formato esperado. Corrige el campo indicado.      |
+| Invalid login credentials                                                | Correo o contraseña incorrectos, o la cuenta no existe.                  |

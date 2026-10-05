@@ -43,10 +43,10 @@ El desarrollo e implementación del **Sistema ERP para Autoescuela Dunamis** rep
 
 ## Matriz Comparativa: Antes (AS-IS) vs. Después (TO-BE)
 
-| Proceso                     | Situación Actual (AS-IS)                       | Con el Sistema ERP (TO-BE)                                      | Valor Agregado Directo                                           |
-| --------------------------- | ---------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Proceso                     | Situación Actual (AS-IS)                       | Con el Sistema ERP (TO-BE)                                                         | Valor Agregado Directo                                           |
+| --------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | **Inscripción**             | Llenado de contrato físico y archivo manual.   | Registro digital del alumno (respaldo de evidencia en Supabase Storage: previsto). | Cero riesgo de pérdida de expedientes; consulta inmediata.       |
-| **Control de Pagos**        | Anotaciones en libro contable físico.          | Módulo financiero con estados (Pagado, Pendiente, Vencido) y cuentas por cobrar. | Control de morosidad y reportes de recaudación. |
-| **Programación de Clases**  | Coordinación manual diaria por WhatsApp.       | Agenda centralizada en el sistema.                              | Eliminación de traslapes y ahorro significativo de horas/hombre. |
-| **Avance de Alumnos**       | Recuento de firmas físicas en bitácora.        | Barra de progreso digital por total de horas del paquete.       | Transparencia total para el estudiante y la administración.      |
-| **Mantenimiento Vehicular** | Envío de fotos por WhatsApp al jefe/encargado. | Registro estructurado de kilometraje y costos por vehículo.     | Control preventivo de costos operativos de la flota.             |
+| **Control de Pagos**        | Anotaciones en libro contable físico.          | Módulo financiero con estados (Pagado, Pendiente, Vencido) y cuentas por cobrar.   | Control de morosidad y reportes de recaudación.                  |
+| **Programación de Clases**  | Coordinación manual diaria por WhatsApp.       | Agenda centralizada en el sistema.                                                 | Eliminación de traslapes y ahorro significativo de horas/hombre. |
+| **Avance de Alumnos**       | Recuento de firmas físicas en bitácora.        | Barra de progreso digital por total de horas del paquete.                          | Transparencia total para el estudiante y la administración.      |
+| **Mantenimiento Vehicular** | Envío de fotos por WhatsApp al jefe/encargado. | Registro estructurado de kilometraje y costos por vehículo.                        | Control preventivo de costos operativos de la flota.             |

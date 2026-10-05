@@ -8,7 +8,9 @@ Instructor, Vehículo, Mantenimiento y Pago.
 
 ![Modelo Entidad-Relación del sistema](assets/modelo-er.png)
 
-Reproducción del mismo modelo en Mermaid (versionable en texto):
+La imagen es la versión original del modelo. El diagrama Mermaid siguiente es
+la versión actualizada (versionable en texto) e incluye cambios posteriores,
+como `instructor.fecha_ingreso`:
 
 ```mermaid
 erDiagram
@@ -155,6 +157,6 @@ erDiagram
 | monto | decimal | | Monto del abono. |
 | fecha | date | | Fecha del pago. |
 | metodo | varchar | | Método (p. ej. efectivo, tarjeta, transferencia). |
-| estado | varchar | | Estado guardado: `pagado` o `pendiente`. `vencido` no se guarda: la API lo deriva de un `pendiente` con fecha pasada. |
+| estado | varchar | | Estado guardado: `pagado` o `pendiente` (la API no acepta `vencido`; las filas del seed con `vencido` guardado se tratan igual). `vencido` se deriva de un `pendiente` con fecha pasada. |
 
 **Anterior:** [← Arquitectura](../03-arquitectura/diseno-tecnico.md) · **Siguiente:** [Mockups →](../05-diseno-ui/mockups.md)
