@@ -36,6 +36,7 @@ export const PagosPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>(); // carga de la lista: reemplaza las tablas
   const [aviso, setAviso] = useState<string>(); // fallos que no invalidan lo mostrado
+  const [avisoAlumnos, setAvisoAlumnos] = useState<string>();
   const [success, setSuccess] = useState<string>();
 
   const [modal, setModal] = useState<Modal>();
@@ -43,6 +44,9 @@ export const PagosPage = () => {
   const [modalError, setModalError] = useState<string>();
   const [saldo, setSaldo] = useState<SaldoAlumno>();
   const dialogo = useRef<HTMLDialogElement>(null);
+  const nuevo = useRef<HTMLButtonElement>(null);
+  // `saving` llega tarde a un segundo click del mismo tick; el ref no.
+  const enviando = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -52,7 +56,8 @@ export const PagosPage = () => {
         if (!cancelled) setAlumnos(lista);
       })
       .catch((cause: unknown) => {
-        if (!cancelled) setAviso(`No se pudieron cargar los estudiantes: ${mensajeDeError(cause)}`);
+        if (!cancelled)
+          setAvisoAlumnos(`No se pudieron cargar los estudiantes: ${mensajeDeError(cause)}`);
       });
     return () => {
       cancelled = true;
@@ -63,7 +68,7 @@ export const PagosPage = () => {
   // que ya no es el mostrado.
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    setLoading(true); // las filas previas siguen visibles mientras recarga
     Promise.all([
       pagosApi.listar({ id_alumno: filtroAlumno, estado: filtroEstado }),
       pagosApi.cuentasPorCobrar(),
@@ -120,7 +125,8 @@ export const PagosPage = () => {
 
   const guardar = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!modal) return;
+    if (!modal || enviando.current) return;
+    enviando.current = true;
     setSaving(true);
     setModalError(undefined);
     try {
@@ -131,22 +137,32 @@ export const PagosPage = () => {
       setSuccess(modal.original ? "Pago actualizado." : "Abono registrado.");
       setRecarga((n) => n + 1);
     } catch (cause) {
-      setModalError(mensajeDeError(cause));
+      // Un doble Escape cierra el <dialog> aunque onCancel lo impida: el error
+      // va a la página. Se refresca por si el pago ya no existe (404).
+      if (dialogo.current?.open) setModalError(mensajeDeError(cause));
+      else setAviso(mensajeDeError(cause));
+      setRecarga((n) => n + 1);
     } finally {
+      enviando.current = false;
       setSaving(false);
     }
   };
 
   const eliminar = async (pago: PagoListado) => {
+    if (enviando.current) return;
     if (!window.confirm(`¿Eliminar el pago de ${dinero(pago.monto)} de ${pago.alumno}?`)) return;
     setSuccess(undefined);
     setAviso(undefined);
+    enviando.current = true;
     try {
       await pagosApi.eliminar(pago.id_pago);
       setSuccess("Pago eliminado.");
-      setRecarga((n) => n + 1);
     } catch (cause) {
       setAviso(mensajeDeError(cause));
+    } finally {
+      enviando.current = false;
+      setRecarga((n) => n + 1); // también tras un 404: quita la fila obsoleta
+      nuevo.current?.focus(); // la fila (y su botón) puede desaparecer
     }
   };
 
@@ -162,6 +178,7 @@ export const PagosPage = () => {
         </div>
         <button
           className="pagos-primary"
+          ref={nuevo}
           onClick={() => {
             abrir({ form: formNuevo(filtroAlumno) });
           }}
@@ -179,6 +196,7 @@ export const PagosPage = () => {
               key={estado ?? "todos"}
               onClick={() => {
                 setFiltroEstado(estado);
+                setAviso(undefined);
               }}
               type="button"
             >
@@ -191,6 +209,7 @@ export const PagosPage = () => {
           <select
             onChange={(event) => {
               setFiltroAlumno(Number(event.target.value));
+              setAviso(undefined);
             }}
             value={filtroAlumno}
           >
@@ -204,7 +223,7 @@ export const PagosPage = () => {
         </label>
       </div>
 
-      <ApiMessage error={error ?? aviso} success={success} />
+      <ApiMessage error={error ?? aviso ?? avisoAlumnos} success={success} />
 
       {!error && (
         <>
@@ -222,48 +241,47 @@ export const PagosPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {!loading &&
-                  pagos.map((pago) => (
-                    <tr key={pago.id_pago}>
-                      <td>
-                        <strong>{pago.alumno}</strong>
-                      </td>
-                      <td>{pago.curso}</td>
-                      <td>
-                        <strong>{dinero(pago.monto)}</strong>
-                      </td>
-                      <td>{fechaCorta(pago.fecha)}</td>
-                      <td>{titulo(pago.metodo)}</td>
-                      <td>
-                        <span className={`pagos-estado ${pago.estado}`}>
-                          {pago.estado.toUpperCase()}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          className="pagos-link"
-                          onClick={() => {
-                            abrir({ original: pago, form: formDesdePago(pago) });
-                          }}
-                          type="button"
-                        >
-                          EDITAR
-                        </button>
-                        <button
-                          className="pagos-link danger"
-                          onClick={() => {
-                            void eliminar(pago);
-                          }}
-                          type="button"
-                        >
-                          ELIMINAR
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                {pagos.map((pago) => (
+                  <tr key={pago.id_pago}>
+                    <td>
+                      <strong>{pago.alumno}</strong>
+                    </td>
+                    <td>{pago.curso}</td>
+                    <td>
+                      <strong>{dinero(pago.monto)}</strong>
+                    </td>
+                    <td>{fechaCorta(pago.fecha)}</td>
+                    <td>{titulo(pago.metodo)}</td>
+                    <td>
+                      <span className={`pagos-estado ${pago.estado}`}>
+                        {pago.estado.toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="pagos-link"
+                        onClick={() => {
+                          abrir({ original: pago, form: formDesdePago(pago) });
+                        }}
+                        type="button"
+                      >
+                        EDITAR
+                      </button>
+                      <button
+                        className="pagos-link danger"
+                        onClick={() => {
+                          void eliminar(pago);
+                        }}
+                        type="button"
+                      >
+                        ELIMINAR
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-            {loading && <p className="pagos-empty">Cargando pagos...</p>}
+            {loading && pagos.length === 0 && <p className="pagos-empty">Cargando pagos...</p>}
             {!loading && pagos.length === 0 && (
               <p className="pagos-empty">No hay pagos para estos filtros.</p>
             )}
@@ -284,39 +302,38 @@ export const PagosPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {!loading &&
-                  cuentas.map((cuenta) => (
-                    <tr key={cuenta.id_alumno}>
-                      <td>
-                        <strong>{cuenta.alumno}</strong>
-                      </td>
-                      <td>{cuenta.curso}</td>
-                      <td>{dinero(cuenta.precio)}</td>
-                      <td>{dinero(cuenta.total_pagado)}</td>
-                      <td>
-                        <strong>{dinero(cuenta.saldo_pendiente)}</strong>
-                      </td>
-                      <td>
-                        <span className={`pagos-estado ${cuenta.estado}`}>
-                          {cuenta.estado.toUpperCase()}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          className="pagos-link"
-                          onClick={() => {
-                            abrir({ form: formNuevo(cuenta.id_alumno) });
-                          }}
-                          type="button"
-                        >
-                          ABONAR
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                {cuentas.map((cuenta) => (
+                  <tr key={cuenta.id_alumno}>
+                    <td>
+                      <strong>{cuenta.alumno}</strong>
+                    </td>
+                    <td>{cuenta.curso}</td>
+                    <td>{dinero(cuenta.precio)}</td>
+                    <td>{dinero(cuenta.total_pagado)}</td>
+                    <td>
+                      <strong>{dinero(cuenta.saldo_pendiente)}</strong>
+                    </td>
+                    <td>
+                      <span className={`pagos-estado ${cuenta.estado}`}>
+                        {cuenta.estado.toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="pagos-link"
+                        onClick={() => {
+                          abrir({ form: formNuevo(cuenta.id_alumno) });
+                        }}
+                        type="button"
+                      >
+                        ABONAR
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-            {loading && <p className="pagos-empty">Cargando cuentas...</p>}
+            {loading && cuentas.length === 0 && <p className="pagos-empty">Cargando cuentas...</p>}
             {!loading && cuentas.length === 0 && (
               <p className="pagos-empty">No hay cuentas por cobrar.</p>
             )}
@@ -427,7 +444,7 @@ export const PagosPage = () => {
                 ESTADO
                 <select
                   onChange={(event) => {
-                    cambiar({ estado: event.target.value as EstadoPago });
+                    cambiar({ estado: event.target.value as FormPago["estado"] });
                   }}
                   value={modal.form.estado}
                 >

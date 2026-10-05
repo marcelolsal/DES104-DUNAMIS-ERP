@@ -1,4 +1,4 @@
-import type { EstadoPago, NuevoPago, Pago, PagoListado, SaldoAlumno } from "@dunamis/contracts";
+import type { EstadoPago, NuevoPago, PagoListado, SaldoAlumno } from "@dunamis/contracts";
 import { api } from "./client.js";
 
 export const pagosApi = {
@@ -12,8 +12,8 @@ export const pagosApi = {
   saldo: (idAlumno: number) => api<SaldoAlumno>(`/api/pagos/saldo/${String(idAlumno)}`),
   cuentasPorCobrar: () => api<SaldoAlumno[]>("/api/pagos/cuentas-por-cobrar"),
   crear: (datos: NuevoPago) =>
-    api<Pago>("/api/pagos", { method: "POST", body: JSON.stringify(datos) }),
+    api<PagoListado>("/api/pagos", { method: "POST", body: JSON.stringify(datos) }),
   actualizar: (id: number, datos: NuevoPago) =>
-    api<Pago>(`/api/pagos/${String(id)}`, { method: "PUT", body: JSON.stringify(datos) }),
+    api<PagoListado>(`/api/pagos/${String(id)}`, { method: "PUT", body: JSON.stringify(datos) }),
   eliminar: (id: number) => api<undefined>(`/api/pagos/${String(id)}`, { method: "DELETE" }),
 };

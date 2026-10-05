@@ -1,4 +1,4 @@
-import type { EstadoPago, NuevoPago, PagoListado } from "@dunamis/contracts";
+import type { NuevoPago, PagoListado } from "@dunamis/contracts";
 
 // Lógica pura de la página de Pagos. Sin React ni red → testeable en aislamiento.
 
@@ -7,7 +7,7 @@ export interface FormPago {
   monto: string; // valor crudo del <input type="number">
   fecha: string; // YYYY-MM-DD
   metodo: NuevoPago["metodo"];
-  estado: EstadoPago;
+  estado: NuevoPago["estado"];
 }
 
 // Las fechas de pago son de calendario: el backend las devuelve como ISO a
