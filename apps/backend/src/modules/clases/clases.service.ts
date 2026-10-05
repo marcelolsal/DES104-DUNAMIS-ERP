@@ -1,6 +1,6 @@
 import type { NuevoClase } from "@dunamis/contracts";
 import { config } from "../../shared/config.js";
-import { clasesRepository } from "./clases.repository.js";
+import { clasesRepository, type Transaccion } from "./clases.repository.js";
 import { rangoAgenda } from "./rango-agenda.js";
 import { solapesCon } from "./solape.js";
 
@@ -20,14 +20,16 @@ const validarReferencias = async (datos: NuevoClase) => {
 };
 
 // Rechaza si el instructor o el vehículo ya están ocupados en la franja.
-// Una clase cancelada no ocupa franja, así que no se valida.
-const validarSolape = async (datos: NuevoClase, excluirId?: number) => {
+// Una clase cancelada no ocupa franja, así que no se valida. Corre dentro de la
+// transacción que escribe, tras bloquear la agenda del instructor y del vehículo:
+// dos requests simultáneos no pueden validar ambos antes de que el otro escriba.
+const validarSolape = async (datos: NuevoClase, tx: Transaccion, excluirId?: number) => {
   if (datos.estado === "cancelada") return;
-  const candidatas = await clasesRepository.posiblesConflictos({
-    id_instructor: datos.id_instructor,
-    id_vehiculo: datos.id_vehiculo,
-    excluirId,
-  });
+  await clasesRepository.bloquearAgenda(tx, datos.id_instructor, datos.id_vehiculo);
+  const candidatas = await clasesRepository.posiblesConflictos(
+    { id_instructor: datos.id_instructor, id_vehiculo: datos.id_vehiculo, excluirId },
+    tx,
+  );
   const choques = solapesCon(datos.fecha_hora, candidatas, config.CLASE_DURACION_MIN);
   if (choques.length === 0) return;
   const instructorOcupado = choques.some((c) => c.id_instructor === datos.id_instructor);
@@ -62,15 +64,19 @@ export const clasesService = {
 
   crear: async (datos: NuevoClase) => {
     await validarReferencias(datos);
-    await validarSolape(datos);
-    return clasesRepository.crear(datos);
+    return clasesRepository.transaccion(async (tx) => {
+      await validarSolape(datos, tx);
+      return clasesRepository.crear(datos, tx);
+    });
   },
 
   actualizar: async (id: number, datos: NuevoClase) => {
     await clasesService.obtener(id); // 404 si no existe
     await validarReferencias(datos);
-    await validarSolape(datos, id);
-    return clasesRepository.actualizar(id, datos);
+    return clasesRepository.transaccion(async (tx) => {
+      await validarSolape(datos, tx, id);
+      return clasesRepository.actualizar(id, datos, tx);
+    });
   },
 
   eliminar: async (id: number) => {
