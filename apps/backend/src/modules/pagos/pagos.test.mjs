@@ -46,6 +46,7 @@ const fila = (id_pago, monto, estado = "pagado", fecha = "2026-01-10") => ({
 const abono = { id_alumno: 1, monto: 150, fecha: "2026-10-04", metodo: "efectivo" };
 
 // Alumno 1: paquete de 450 con 300 pagados → debe 150. Alumno 2: al día.
+const tx = { transaccion: true };
 let pagos;
 beforeEach(() => {
   mock.restoreAll();
@@ -54,7 +55,7 @@ beforeEach(() => {
     { id_alumno: 1, alumno: "Ana", curso: "Estándar", precio: 450 },
     { id_alumno: 2, alumno: "Luis", curso: "Estándar", precio: 0 },
   ];
-  mock.method(pagosRepository, "transaccion", (operacion) => operacion("tx"));
+  mock.method(pagosRepository, "transaccion", (operacion) => operacion(tx));
   mock.method(pagosRepository, "cuentas", async (id) =>
     cuentas.filter((cuenta) => id === undefined || cuenta.id_alumno === id),
   );
@@ -66,8 +67,19 @@ beforeEach(() => {
     "obtener",
     async (id) => pagos.find((p) => p.id_pago === id) ?? null,
   );
-  mock.method(pagosRepository, "crear", async (datos) => ({ ...datos, id_pago: 99 }));
-  mock.method(pagosRepository, "actualizar", async (id, datos) => ({ ...datos, id_pago: id }));
+  // Como el repo real: guardan la fila y devuelven el Pago (fecha Date, sin alumno/curso).
+  const guardar = (id_pago, datos) => {
+    const guardado = { ...datos, id_pago, fecha: new Date(datos.fecha) };
+    pagos = [
+      ...pagos.filter((p) => p.id_pago !== id_pago),
+      { ...guardado, alumno: "Ana", curso: "Estándar" },
+    ];
+    return guardado;
+  };
+  mock.method(pagosRepository, "crear", async (datos) => guardar(99, datos));
+  mock.method(pagosRepository, "actualizar", async (id, datos) =>
+    pagos.some((p) => p.id_pago === id) ? guardar(id, datos) : null,
+  );
   mock.method(pagosRepository, "eliminar", async () => undefined);
 });
 
@@ -77,10 +89,68 @@ test("sin token → 401", async () => {
   assert.equal(pagosRepository.listar.mock.callCount(), 0);
 });
 
-test("POST abono dentro del saldo → 201, estado por defecto pagado", async () => {
+test("POST abono dentro del saldo → 201, estado por defecto pagado, misma forma que GET", async () => {
   const res = await pedir("POST", "/api/pagos", abono);
   assert.equal(res.statusCode, 201);
-  assert.deepEqual(res.json(), { ...abono, estado: "pagado", id_pago: 99 });
+  assert.deepEqual(res.json(), {
+    ...abono,
+    fecha: "2026-10-04T00:00:00.000Z",
+    estado: "pagado",
+    id_pago: 99,
+    alumno: "Ana",
+    curso: "Estándar",
+  });
+  assert.deepEqual(res.json(), (await pedir("GET", "/api/pagos/99")).json());
+});
+
+test("POST/PUT validan, bloquean y releen dentro de la transacción", async () => {
+  await pedir("POST", "/api/pagos", abono);
+  await pedir("PUT", "/api/pagos/1", abono);
+  for (const metodo of ["cuentas", "listar", "obtener"]) {
+    const enTx = pagosRepository[metodo].mock.calls.filter((c) => c.arguments[1] === tx);
+    assert.equal(enTx.length, 2, metodo);
+  }
+  assert.equal(pagosRepository.crear.mock.calls[0].arguments[1], tx);
+  assert.equal(pagosRepository.actualizar.mock.calls[0].arguments[2], tx);
+});
+
+test("cuentas con tx usa FOR UPDATE sobre el alumno", async () => {
+  mock.restoreAll();
+  const llamadas = [];
+  // Query builder falso: encadena cualquier método y al await devuelve [].
+  const txFalso = new Proxy(
+    {},
+    {
+      get: (_, metodo) =>
+        metodo === "then"
+          ? (ok) => ok([])
+          : (...args) => {
+              llamadas.push([metodo, args[0]]);
+              return txFalso;
+            },
+    },
+  );
+  await pagosRepository.cuentas(1, txFalso);
+  assert.deepEqual(llamadas.at(-1), ["for", "update"]);
+});
+
+test("PUT responde el estado efectivo con alumno y curso, como GET", async () => {
+  const res = await pedir("PUT", "/api/pagos/1", {
+    ...abono,
+    estado: "pendiente",
+    fecha: "2020-01-01",
+  });
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.json().estado, "vencido");
+  assert.equal(res.json().fecha, "2020-01-01T00:00:00.000Z");
+  assert.deepEqual(res.json(), (await pedir("GET", "/api/pagos/1")).json());
+});
+
+test("estado vencido en escritura → 400 (lo deriva el backend)", async () => {
+  const vencido = { ...abono, fecha: "2030-01-01", estado: "vencido" };
+  assert.equal((await pedir("POST", "/api/pagos", vencido)).statusCode, 400);
+  assert.equal((await pedir("PUT", "/api/pagos/1", vencido)).statusCode, 400);
+  assert.equal(pagosRepository.transaccion.mock.callCount(), 0);
 });
 
 test("POST abono que excede el saldo → 409 y no se guarda", async () => {
@@ -152,6 +222,19 @@ test("ids fuera de int4 → 400, no 500", async () => {
   const post = await pedir("POST", "/api/pagos", { ...abono, id_alumno: grande });
   assert.equal(post.statusCode, 400);
   assert.equal(pagosRepository.transaccion.mock.callCount(), 0);
+});
+
+test("ids no decimales (0x10, 1e3) → 400", async () => {
+  for (const id of ["0x10", "1e3", "+5", " 7"]) {
+    const ruta = encodeURIComponent(id);
+    assert.equal((await pedir("GET", `/api/pagos/${ruta}`)).statusCode, 400, id);
+    assert.equal((await pedir("PUT", `/api/pagos/${ruta}`, abono)).statusCode, 400, id);
+    assert.equal((await pedir("DELETE", `/api/pagos/${ruta}`)).statusCode, 400, id);
+    assert.equal((await pedir("GET", `/api/pagos/saldo/${ruta}`)).statusCode, 400, id);
+    assert.equal((await pedir("GET", `/api/pagos?id_alumno=${ruta}`)).statusCode, 400, id);
+  }
+  assert.equal(pagosRepository.obtener.mock.callCount(), 0);
+  assert.equal(pagosRepository.listar.mock.callCount(), 0);
 });
 
 test("DELETE existente → 204", async () => {

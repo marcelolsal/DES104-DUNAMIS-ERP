@@ -23,8 +23,9 @@ const aSaldo = (cuenta: Cuenta, abonos: PagoListado[], hoy: Date): SaldoAlumno =
   ...calcularSaldo(cuenta.precio, abonos, hoy),
 });
 
-const obtenerPago = async (id: number) => {
-  const pago = await pagosRepository.obtener(id);
+// POST/PUT responden con esto mismo (leído dentro de su transacción).
+const obtenerPago = async (id: number, tx?: Transaccion) => {
+  const pago = await pagosRepository.obtener(id, tx);
   if (!pago) throw errorDeNegocio("Pago no encontrado", 404);
   return conEstadoEfectivo(pago, new Date());
 };
@@ -95,16 +96,18 @@ export const pagosService = {
   crear: (datos: NuevoPago) =>
     pagosRepository.transaccion(async (tx) => {
       await validarAbono(datos, tx);
-      return pagosRepository.crear(datos, tx);
+      const { id_pago } = await pagosRepository.crear(datos, tx);
+      return obtenerPago(id_pago, tx);
     }),
 
   actualizar: async (id: number, datos: ActualizarPago) => {
     await obtenerPago(id);
     return pagosRepository.transaccion(async (tx) => {
       await validarAbono(datos, tx, id);
-      const pago = await pagosRepository.actualizar(id, datos, tx);
-      if (!pago) throw errorDeNegocio("Pago no encontrado", 404);
-      return pago;
+      if (!(await pagosRepository.actualizar(id, datos, tx))) {
+        throw errorDeNegocio("Pago no encontrado", 404);
+      }
+      return obtenerPago(id, tx);
     });
   },
 
