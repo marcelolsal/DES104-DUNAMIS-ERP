@@ -10,10 +10,15 @@ export interface Rango {
 // Mismo tope que reporteFinancieroQuerySchema (ambos extremos cuentan).
 const MAX_DIAS_RANGO = 366;
 const FECHA = /^\d{4}-\d{2}-\d{2}$/u;
-// Formato y día real (Date.parse normaliza 2026-02-31 a 03-03; el contrato lo rechaza).
+// Formato, día real (Date.parse normaliza 2026-02-31 a 03-03) y año ≥ 1, como el contrato.
 const esFecha = (fecha: string): boolean => {
   const ms = Date.parse(fecha);
-  return FECHA.test(fecha) && !Number.isNaN(ms) && new Date(ms).toISOString().startsWith(fecha);
+  return (
+    FECHA.test(fecha) &&
+    !fecha.startsWith("0000") &&
+    !Number.isNaN(ms) &&
+    new Date(ms).toISOString().startsWith(fecha)
+  );
 };
 
 const diaEnElSalvador = new Intl.DateTimeFormat("en-CA", { timeZone: "America/El_Salvador" });

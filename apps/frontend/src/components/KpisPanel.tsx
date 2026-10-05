@@ -16,7 +16,7 @@ interface TarjetaProps {
 
 const Tarjeta = ({ titulo, monto, tono, detalle }: TarjetaProps): ReactNode => (
   <article className={`kpis-card kpis-card--${tono}`}>
-    <h3>{titulo}</h3>
+    <p className="kpis-titulo">{titulo}</p>
     <p className="kpis-valor">{monto === undefined ? "—" : formatoDinero(monto)}</p>
     {detalle && <p className="kpis-detalle">{detalle}</p>}
   </article>
@@ -110,6 +110,28 @@ const FiltroRango = ({
   );
 };
 
+// El detalle refleja la regla del backend: "pendiente" solo cuenta desde hoy.
+const TARJETAS_DEL_RANGO = [
+  {
+    clave: "total_recaudado",
+    titulo: "Total recaudado",
+    tono: "verde",
+    detalle: "Abonos pagados en el periodo",
+  },
+  {
+    clave: "pendiente_de_cobro",
+    titulo: "Pendiente de cobro",
+    tono: "amarillo",
+    detalle: "Abonos pendientes con fecha desde hoy",
+  },
+  {
+    clave: "cobros_vencidos",
+    titulo: "Cobros vencidos",
+    tono: "rojo",
+    detalle: "Pendientes con fecha pasada y vencidos",
+  },
+] as const;
+
 export const KpisPanel = (): ReactNode => {
   const [rango, setRango] = useState<Rango>(() => rangoDelMes(new Date()));
   const { reporte, error, cargando } = useReporte(rango);
@@ -120,15 +142,17 @@ export const KpisPanel = (): ReactNode => {
       <h2 id="kpis-titulo">Indicadores</h2>
       <FiltroRango inicial={rango} onAplicar={setRango} />
       <ApiMessage error={error} />
-      <p aria-live="polite" className="kpis-periodo">
-        {cargando
-          ? "Cargando indicadores…"
-          : `Periodo: ${formatoFecha(rango.desde)} – ${formatoFecha(rango.hasta)}`}
-      </p>
+      {!error && (
+        <p aria-live="polite" className="kpis-periodo">
+          {cargando
+            ? "Cargando indicadores…"
+            : `Periodo: ${formatoFecha(rango.desde)} – ${formatoFecha(rango.hasta)}`}
+        </p>
+      )}
       <div aria-busy={cargando} className="kpis-grid">
-        <Tarjeta monto={reporte?.total_recaudado} titulo="Total recaudado" tono="verde" />
-        <Tarjeta monto={reporte?.pendiente_de_cobro} titulo="Pendiente de cobro" tono="amarillo" />
-        <Tarjeta monto={reporte?.cobros_vencidos} titulo="Cobros vencidos" tono="rojo" />
+        {TARJETAS_DEL_RANGO.map(({ clave, ...tarjeta }) => (
+          <Tarjeta key={clave} monto={reporte?.[clave]} {...tarjeta} />
+        ))}
       </div>
       {reporte && sinMovimientos(reporte) && (
         <p className="kpis-vacio" role="status">
