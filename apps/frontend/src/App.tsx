@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { NuevoAlumno, Paquete, EstudianteListado } from "@dunamis/contracts";
 import { estudiantesApi } from "./api/estudiantes.js";
@@ -12,6 +12,7 @@ import { VehiculosPanel } from "./components/VehiculosPanel.js";
 import { ClasesPage } from "./components/ClasesPage.js";
 import { PagosPage } from "./components/PagosPage.js";
 import { KpisPanel } from "./components/KpisPanel.js";
+import { mensajeDeError } from "./components/ApiMessage.js";
 import "./app.css";
 import "./students.css";
 
@@ -59,6 +60,8 @@ export const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const [seccion, setSeccion] = useState<Seccion>("estudiantes");
+  const deleting = useRef(false);
+  const newButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -97,10 +100,11 @@ export const App = () => {
     setPackages(packageData);
   }
 
+  // También al volver a la pestaña: marcar clases impartidas cambia progreso y estado.
   useEffect(() => {
-    if (!session) return;
+    if (!session || seccion !== "estudiantes") return;
     loadStudents().catch((e: unknown) => setError(String(e)));
-  }, [session]);
+  }, [session, seccion]);
 
   function openCreate() {
     setEditing(undefined);
@@ -131,6 +135,22 @@ export const App = () => {
       setLoading(false);
     }
   }
+
+  const deleteStudent = async (student: EstudianteListado): Promise<void> => {
+    if (deleting.current || !window.confirm(`¿Eliminar al estudiante “${student.nombre}”? Esta acción no se puede deshacer.`)) return;
+    deleting.current = true;
+    setError(undefined);
+    try {
+      await estudiantesApi.eliminar(student.id_alumno);
+    } catch (e: unknown) {
+      setError(mensajeDeError(e)); // 409: tiene clases o pagos
+    } finally {
+      deleting.current = false;
+      newButton.current?.focus(); // la fila puede desaparecer
+      // También tras un 404: quita la fila obsoleta.
+      loadStudents().catch((e: unknown) => { setError(mensajeDeError(e)); });
+    }
+  };
 
   const handleLogout = async (): Promise<void> => {
     // Quita el #login heredado para volver a la landing, no al formulario.
@@ -170,7 +190,7 @@ export const App = () => {
       {seccion === "estudiantes" && <section className="students-content">
         <div className="students-heading">
           <div><p className="section-kicker">GESTIÓN</p><h1>ESTUDIANTES</h1></div>
-          <button className="primary-button" onClick={openCreate} type="button">+ NUEVO ESTUDIANTE</button>
+          <button className="primary-button" onClick={openCreate} ref={newButton} type="button">+ NUEVO ESTUDIANTE</button>
         </div>
         <div className="students-toolbar">
           <input aria-label="Buscar estudiantes" onChange={(event) => { setSearch(event.target.value); }} placeholder="Buscar por nombre o email..." value={search} />
@@ -185,13 +205,13 @@ export const App = () => {
             <tbody>
               {visibleStudents.map((student) => (
                 <tr key={student.id_alumno}>
-                  <td><strong>{student.nombre}</strong><small>{student.correo}</small></td>
+                  <td><strong>{student.nombre}</strong><small>{student.correo} · #{student.id_alumno}</small></td>
                   <td>{student.curso}</td>
                   <td>{student.instructor ?? "Sin asignar"}</td>
                   <td><div className="progress-cell"><span><i style={{ width: `${student.progreso}%` }} /></span>{student.horas_completadas}h</div></td>
                   <td><span className={`status-badge ${student.estado.toLowerCase()}`}>{student.estado.toUpperCase()}</span></td>
                   <td>{formatDate(student.fecha_inscripcion)}</td>
-                  <td><button className="edit-button" onClick={() => { openEdit(student); }} type="button">EDITAR</button></td>
+                  <td><button className="edit-button" onClick={() => { openEdit(student); }} type="button">EDITAR</button><button aria-label={`Eliminar a ${student.nombre}`} className="edit-button danger" onClick={() => { void deleteStudent(student); }} type="button">ELIMINAR</button></td>
                 </tr>
               ))}
             </tbody>

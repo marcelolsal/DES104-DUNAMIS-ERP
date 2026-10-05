@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SyntheticEvent } from "react";
 import type { EstadoPago, PagoListado, SaldoAlumno } from "@dunamis/contracts";
+import { etiquetadorAlumnos } from "../alumnos.js";
 import { estudiantesApi } from "../api/estudiantes.js";
 import { pagosApi } from "../api/pagos.js";
 import { armarPago, dinero, fechaCorta, formDesdePago, formNuevo } from "../pagos.js";
@@ -32,7 +33,7 @@ export const PagosPage = () => {
   const [recarga, setRecarga] = useState(0);
   const [pagos, setPagos] = useState<PagoListado[]>([]);
   const [cuentas, setCuentas] = useState<SaldoAlumno[]>([]);
-  const [alumnos, setAlumnos] = useState<{ id_alumno: number; nombre: string }[]>([]);
+  const [alumnos, setAlumnos] = useState<{ id: number; nombre: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>(); // carga de la lista: reemplaza las tablas
   const [aviso, setAviso] = useState<string>(); // fallos que no invalidan lo mostrado
@@ -59,7 +60,8 @@ export const PagosPage = () => {
     estudiantesApi
       .listar()
       .then((lista) => {
-        if (!cancelled) setAlumnos(lista);
+        if (!cancelled)
+          setAlumnos(lista.map(({ id_alumno, nombre }) => ({ id: id_alumno, nombre })));
       })
       .catch((cause: unknown) => {
         if (!cancelled)
@@ -172,6 +174,7 @@ export const PagosPage = () => {
     }
   };
 
+  const etiquetaAlumno = etiquetadorAlumnos(alumnos);
   const yaDescontado =
     modal?.original?.estado === "pagado" && modal.original.id_alumno === alumnoModal;
 
@@ -221,8 +224,8 @@ export const PagosPage = () => {
           >
             <option value={0}>Todos</option>
             {alumnos.map((alumno) => (
-              <option key={alumno.id_alumno} value={alumno.id_alumno}>
-                {alumno.nombre}
+              <option key={alumno.id} value={alumno.id}>
+                {etiquetaAlumno(alumno)}
               </option>
             ))}
           </select>
@@ -391,8 +394,8 @@ export const PagosPage = () => {
                   Selecciona un estudiante
                 </option>
                 {alumnos.map((alumno) => (
-                  <option key={alumno.id_alumno} value={alumno.id_alumno}>
-                    {alumno.nombre}
+                  <option key={alumno.id} value={alumno.id}>
+                    {etiquetaAlumno(alumno)}
                   </option>
                 ))}
               </select>
