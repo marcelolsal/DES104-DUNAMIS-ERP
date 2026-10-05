@@ -3,13 +3,14 @@ import { fechaPayloadSchema } from "./fecha.js";
 
 const INT4_MAX = 2_147_483_647;
 
+// Longitudes = varchar de la BD: un texto más largo es 400, no un 500 de Postgres.
 export const alumnoSchema = z.object({
   id_alumno: z.number().int().positive(),
-  nombre: z.string().min(1),
-  dui: z.string().min(1),
-  correo: z.string().email(),
-  telefono: z.string().min(1),
-  contacto_emergencia: z.string().min(1),
+  nombre: z.string().min(1).max(160),
+  dui: z.string().min(1).max(20),
+  correo: z.string().email().max(160),
+  telefono: z.string().min(1).max(30),
+  contacto_emergencia: z.string().min(1).max(160),
   fecha_inscripcion: z.coerce.date(),
   id_paquete: z.number().int().positive(),
 });

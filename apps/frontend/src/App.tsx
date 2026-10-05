@@ -201,7 +201,7 @@ export const App = () => {
           {visibleStudents.length === 0 && <p className="empty-state">No hay estudiantes que coincidan con la búsqueda.</p>}
         </div>
       </section>}
-      {modalOpen && <StudentModal editing={editing} error={error} form={form} loading={loading} packages={packages} onChange={setForm} onClose={() => { setModalOpen(false); }} onSubmit={saveStudent} />}
+      {modalOpen && <StudentModal editing={editing} error={error} form={form} loading={loading} packages={packages} onChange={setForm} onClose={() => { setModalOpen(false); setError(undefined); }} onSubmit={saveStudent} />}
     </main>
   );
 };

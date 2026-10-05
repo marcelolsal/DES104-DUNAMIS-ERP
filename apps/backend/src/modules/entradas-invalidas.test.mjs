@@ -116,3 +116,21 @@ test("clase con instructor inexistente → 400", async () => {
   assert.equal(res.statusCode, 400);
   assert.deepEqual(res.json(), { error: "El instructor 1 no existe" });
 });
+
+test("DUI más largo que la columna (varchar 20) → 400 sin tocar la BD", async () => {
+  const res = await pedir("POST", "/api/estudiantes", { ...alumno, dui: "1".repeat(21) });
+  assert.equal(res.statusCode, 400);
+});
+
+test("PUT de una clase borrada en paralelo (el UPDATE no devuelve fila) → 404", async () => {
+  mock.method(clasesRepository, "obtener", async () => ({ id_clase: 7, ...clase }));
+  for (const nombre of ["existeAlumno", "existeInstructor", "existeVehiculo"])
+    mock.method(clasesRepository, nombre, async () => true);
+  mock.method(clasesRepository, "transaccion", (operacion) => operacion({}));
+  mock.method(clasesRepository, "bloquearAgenda", async () => {});
+  mock.method(clasesRepository, "posiblesConflictos", async () => []);
+  mock.method(clasesRepository, "actualizar", async () => null);
+  const res = await pedir("PUT", "/api/clases/7", clase);
+  assert.equal(res.statusCode, 404);
+  assert.deepEqual(res.json(), { error: "Clase no encontrada" });
+});

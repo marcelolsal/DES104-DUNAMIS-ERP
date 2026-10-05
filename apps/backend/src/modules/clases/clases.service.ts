@@ -37,7 +37,21 @@ const validarSolape = async (datos: NuevoClase, tx: Transaccion, excluirId?: num
   const quien = [instructorOcupado && "el instructor", vehiculoOcupado && "el vehículo"]
     .filter(Boolean)
     .join(" y ");
-  throw err(409, `Solape: ${quien} ya tiene una clase en esa franja`);
+  const verbo = instructorOcupado && vehiculoOcupado ? "tienen" : "tiene";
+  throw err(409, `Solape: ${quien} ya ${verbo} una clase en esa franja`);
+};
+
+// FK de Postgres (23503): una referencia se borró entre validarReferencias y la
+// escritura. Se revalida para responder el mismo 400 legible en vez de un 500.
+const conReferenciasValidas = async <T>(datos: NuevoClase, escribir: () => Promise<T>) => {
+  try {
+    return await escribir();
+  } catch (error) {
+    const esFk =
+      typeof error === "object" && error !== null && "code" in error && error.code === "23503";
+    if (esFk) await validarReferencias(datos);
+    throw error;
+  }
 };
 
 // Reglas de negocio. No conoce req/res ni la BD directamente.
@@ -64,19 +78,25 @@ export const clasesService = {
 
   crear: async (datos: NuevoClase) => {
     await validarReferencias(datos);
-    return clasesRepository.transaccion(async (tx) => {
-      await validarSolape(datos, tx);
-      return clasesRepository.crear(datos, tx);
-    });
+    return conReferenciasValidas(datos, () =>
+      clasesRepository.transaccion(async (tx) => {
+        await validarSolape(datos, tx);
+        return clasesRepository.crear(datos, tx);
+      }),
+    );
   },
 
   actualizar: async (id: number, datos: NuevoClase) => {
     await clasesService.obtener(id); // 404 si no existe
     await validarReferencias(datos);
-    return clasesRepository.transaccion(async (tx) => {
-      await validarSolape(datos, tx, id);
-      return clasesRepository.actualizar(id, datos, tx);
-    });
+    const clase = await conReferenciasValidas(datos, () =>
+      clasesRepository.transaccion(async (tx) => {
+        await validarSolape(datos, tx, id);
+        return clasesRepository.actualizar(id, datos, tx);
+      }),
+    );
+    if (!clase) throw err(404, "Clase no encontrada"); // borrada en paralelo
+    return clase;
   },
 
   eliminar: async (id: number) => {
