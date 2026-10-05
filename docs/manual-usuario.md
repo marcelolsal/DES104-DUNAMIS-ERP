@@ -1,8 +1,8 @@
 # Manual de usuario — DUNAMIS ERP
 
 Guía para la secretaría y la administración de la autoescuela. Describe las
-pantallas que ya están disponibles en el sistema. Las secciones marcadas como
-pendientes se completan cuando su módulo esté integrado.
+pantallas disponibles en el sistema y aclara qué acciones todavía no se pueden
+hacer desde la interfaz.
 
 ## Índice
 
@@ -23,22 +23,25 @@ pendientes se completan cuando su módulo esté integrado.
 
 ## 1. Ingreso al sistema
 
-1. Abre la dirección del sistema en el navegador. Aparece el **Panel
-   administrativo** («Bienvenido de vuelta»).
-2. Escribe tu **correo electrónico** y tu **contraseña** (mínimo 6 caracteres).
-3. Pulsa **INICIAR SESION**. Si los datos son incorrectos, el mensaje de error
+1. Abre la dirección del sistema en el navegador. Sin sesión iniciada se
+   muestra la [página pública](#11-página-pública-landing).
+2. Pulsa **Admin** (arriba a la derecha) o **Acceso administrativo** (al pie de
+   la página). Aparece el **Panel administrativo** («Bienvenido de vuelta»).
+   **← Volver al inicio** regresa a la página pública.
+3. Escribe tu **correo electrónico** y tu **contraseña** (mínimo 6 caracteres).
+4. Pulsa **INICIAR SESION**. Si los datos son incorrectos, el mensaje de error
    aparece debajo del formulario.
 
 - No hay registro desde la pantalla: las cuentas las crea el administrador del
   sistema.
 - La sesión queda abierta en ese navegador. Para salir, pulsa **Cerrar sesión**
-  junto a tu correo, arriba a la derecha.
+  junto a tu correo, arriba a la derecha; vuelves a la página pública.
 
 ## 2. Navegación general
 
 Una vez dentro, la barra de pestañas muestra los módulos: **Estudiantes**,
-**Paquetes**, **Vehiculos**, **Mantenimientos** y **Clases**. Al entrar se abre
-Estudiantes.
+**Instructores**, **Paquetes**, **Vehiculos**, **Mantenimientos**, **Clases**,
+**Pagos** y **Finanzas** (reportes y KPIs). Al entrar se abre Estudiantes.
 
 - Los avisos de éxito (verde) o de error (rojo) aparecen arriba del contenido
   del módulo.
@@ -180,19 +183,164 @@ u otro vehículo.
 
 ## 8. Instructores
 
-> Pendiente: se completa cuando el módulo esté integrado.
+### Consultar
+
+Cada instructor aparece en una tarjeta con su **nombre**, **especialidad**,
+**teléfono** y, si tiene fecha de ingreso registrada, el año de antigüedad
+(«Desde 2021»). La tarjeta muestra también dos métricas:
+
+- **Estudiantes:** alumnos distintos con al menos una clase no cancelada con ese
+  instructor.
+- **Horas impartidas:** clases marcadas como impartidas multiplicadas por la
+  duración de la clase (60 minutos por defecto).
+
+Mientras las métricas cargan se ve «…»; si no se pudieron obtener aparece «—» y
+el aviso «No se pudieron cargar las métricas.».
+
+### Registrar o editar un instructor
+
+1. Pulsa **+ NUEVO INSTRUCTOR** (o **EDITAR** en su tarjeta).
+2. Completa **Nombre**, **Especialidad** y **Teléfono** (obligatorios; no
+   pueden quedar solo con espacios) y, si quieres, la **Fecha de ingreso
+   (opcional)**.
+3. Pulsa **GUARDAR**. Para salir sin guardar, pulsa **CANCELAR**, la **×** o la
+   tecla **Esc**.
+
+- La fecha de ingreso **no puede ser futura**: el calendario no deja elegir
+  días posteriores a hoy y, si se envía igual, el sistema responde «La fecha de
+  ingreso no puede ser futura». Para quitarla, borra el campo y guarda.
+
+### Eliminar
+
+Pulsa **ELIMINAR** en la tarjeta y confirma. No se puede eliminar un instructor
+que tenga clases registradas (programadas, impartidas o canceladas).
 
 ## 9. Pagos
 
-> Pendiente: se completa cuando el módulo esté integrado.
+La pestaña **Pagos** reúne los abonos de los estudiantes y sus cuentas por
+cobrar.
+
+### Estados de un abono
+
+| Estado | Significado |
+|--------|-------------|
+| **Pagado** | Dinero ya recibido. Descuenta del saldo del estudiante. |
+| **Pendiente** | Abono acordado, aún no cobrado, con fecha de hoy en adelante. No descuenta del saldo. |
+| **Vencido** | Abono pendiente cuya fecha ya pasó. |
+
+«Vencido» no se elige ni se guarda: el sistema lo calcula solo a partir de un
+abono **Pendiente** con fecha pasada (según la fecha de El Salvador). Al
+registrar o editar solo se elige entre **Pagado** y **Pendiente**.
+
+### Consultar abonos
+
+La tabla muestra **estudiante**, **curso**, **monto**, **fecha**, **método** y
+**estado** de cada abono.
+
+- **Filtrar por estado:** botones **TODOS**, **PAGADO**, **PENDIENTE** y
+  **VENCIDO**.
+- **Filtrar por estudiante:** lista **ESTUDIANTE** (por defecto, «Todos»).
+
+### Cuentas por cobrar
+
+Debajo de los abonos, **CUENTAS POR COBRAR** lista solo a los estudiantes que
+aún deben: **precio** del paquete, total **pagado**, **saldo** y estado de la
+cuenta.
+
+- **Saldo** = precio del paquete − abonos **pagados** (nunca negativo).
+- La cuenta aparece **VENCIDO** si el estudiante tiene al menos un abono
+  vencido; si no, **PENDIENTE**.
+- **ABONAR** abre el registro de pago con ese estudiante ya elegido.
+
+### Registrar un pago
+
+1. Pulsa **+ REGISTRAR PAGO** (si filtraste por un estudiante, ya viene
+   elegido) o **ABONAR** en su cuenta por cobrar.
+2. Elige el **ESTUDIANTE**. Debajo aparece su saldo, p. ej. «Saldo pendiente:
+   $150.00 de $300.00».
+3. Indica **MONTO (USD)** (mayor que 0, con hasta dos decimales), **FECHA** (por
+   defecto, hoy), **MÉTODO** (Efectivo, Tarjeta o Transferencia) y **ESTADO**
+   (Pagado por defecto, o Pendiente).
+4. Pulsa **GUARDAR**. Aparece «Abono registrado.».
+
+- Un abono **no puede superar el saldo pendiente** del estudiante. Si lo
+  supera, el sistema no lo guarda y muestra, por ejemplo, «El abono de 200.00
+  excede el saldo pendiente del alumno (150.00)».
+
+### Editar o eliminar un pago
+
+- **EDITAR** abre el pago con sus datos. Un abono **vencido** se carga como
+  **Pendiente**; para registrar que ya se cobró, cambia el estado a **Pagado**
+  y guarda («Pago actualizado.»). Al editar, el saldo indica «(ya descuenta este
+  pago)» si el abono ya estaba pagado. La validación del saldo solo se aplica si
+  la edición aumenta lo pagado por el estudiante.
+- **ELIMINAR** pide confirmación y borra el abono («Pago eliminado.»).
 
 ## 10. Reportes y KPIs
 
-> Pendiente: se completa cuando el módulo esté integrado.
+La pestaña **Finanzas** muestra el panel **Indicadores**.
+
+### Elegir el periodo
+
+1. Indica **Desde** y **Hasta**. Al entrar, el periodo es el mes en curso.
+2. Pulsa **Aplicar**. Bajo los filtros se confirma el periodo consultado.
+
+El rango incluye ambos días y se valida antes de consultar:
+
+| Mensaje | Causa |
+|---------|-------|
+| Selecciona la fecha inicial y la final. | Falta una de las fechas o no es válida. |
+| La fecha inicial no puede ser posterior a la final. | «Desde» es mayor que «Hasta». |
+| El rango no puede superar 366 días. | El periodo es mayor a un año. |
+
+### Indicadores del periodo
+
+Suman los abonos cuya fecha cae dentro del rango:
+
+- **Total recaudado:** abonos **pagados**.
+- **Pendiente de cobro:** abonos **pendientes** con fecha de hoy en adelante.
+- **Cobros vencidos:** abonos pendientes con fecha ya pasada.
+
+Si no hay abonos en el periodo se muestra «No hay abonos registrados en este
+periodo.».
+
+### Indicadores al día de hoy
+
+No dependen del rango elegido:
+
+- **Ingreso del día:** abonos pagados con fecha de hoy.
+- **Saldo por cobrar:** suma de las cuentas por cobrar de todos los estudiantes
+  (precio del paquete − abonos pagados).
+
+> **«Pendiente de cobro» no es lo mismo que «Saldo por cobrar».** El primero
+> solo suma abonos registrados como pendientes dentro del periodo; el segundo
+> es todo lo que los estudiantes aún deben de su paquete, tengan o no abonos
+> pendientes registrados. Por eso el saldo por cobrar suele ser mayor.
+
+«Hoy» es siempre la fecha de El Salvador.
 
 ## 11. Página pública (landing)
 
-> Pendiente: se completa cuando el módulo esté integrado.
+Es lo que ve cualquier visitante sin sesión. Es informativa: no tiene registro
+en línea ni muestra datos de la base de datos.
+
+- **Encabezado:** enlaces a **Cursos**, **Instructores**, **Precios**,
+  **Testimonios** y **Contacto**, y los botones **Cómo inscribirme** y
+  **Admin** (lleva al ingreso del sistema).
+- **Portada:** «Tu camino inicia aquí.», con **Explorar cursos** y **Cómo
+  inscribirme**.
+- **Cursos:** clases prácticas con instructor y vehículo asignados, avance por
+  horas del paquete y pago por abonos.
+- **Instructores:** especialidades (Ciudad, Autopista, Nocturno, Automático y
+  Mecánico).
+- **Precios:** nombres de los paquetes, sin importes; el precio se confirma en
+  la inscripción.
+- **Testimonios:** por ahora solo indica que se publicarán más adelante.
+- **Contacto:** explica que la inscripción se hace en la secretaría.
+- **Pie de página:** enlace **Acceso administrativo**.
+
+> El contenido de la landing es fijo: los cambios de paquetes o instructores en
+> el sistema no se reflejan en ella.
 
 ## 12. Mensajes y errores frecuentes
 
@@ -200,6 +348,10 @@ u otro vehículo.
 |---------|---------------------------|
 | No se puede eliminar un paquete asignado a alumnos | Hay estudiantes con ese paquete. Cámbiales el curso antes de eliminarlo. |
 | No se puede eliminar un vehículo con clases o mantenimientos asociados | Tiene historial. Márcalo como **De baja** en lugar de eliminarlo. |
+| No se puede eliminar un instructor con clases asociadas | Tiene clases registradas; no se puede borrar. |
+| La fecha de ingreso no puede ser futura | Elige una fecha de ingreso de hoy o anterior, o déjala vacía. |
+| El abono de X excede el saldo pendiente del alumno (Y) | Registra un monto igual o menor al saldo indicado. |
+| El rango no puede superar 366 días | Acorta el periodo de Finanzas a un año como máximo. |
 | Ya existe un vehículo con esa placa | La placa ya está registrada. Revisa el listado. |
 | Solape: el instructor / el vehículo ya tiene una clase en esa franja | Cambia la hora, el instructor o el vehículo. |
 | Mensaje con nombres de campos (p. ej. `correo: ...`) | Algún dato no tiene el formato esperado. Corrige el campo indicado. |
