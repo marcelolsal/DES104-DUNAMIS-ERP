@@ -34,7 +34,8 @@
   font-weight: 800;
   letter-spacing: 1px;
 }
-.pagos-page button:disabled {
+.pagos-page button:disabled,
+.pagos-page button[aria-disabled="true"] {
   cursor: wait;
   opacity: 0.65;
 }

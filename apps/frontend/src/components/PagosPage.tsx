@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { SyntheticEvent } from "react";
 import type { EstadoPago, PagoListado, SaldoAlumno } from "@dunamis/contracts";
 import { estudiantesApi } from "../api/estudiantes.js";
@@ -47,6 +47,12 @@ export const PagosPage = () => {
   const nuevo = useRef<HTMLButtonElement>(null);
   // `saving` llega tarde a un segundo click del mismo tick; el ref no.
   const enviando = useRef(false);
+  // Ref estable: uno inline se re-ejecuta en cada render y reabría el diálogo
+  // recién cerrado antes de su evento close (el foco caía en body).
+  const montarDialogo = useCallback((elemento: HTMLDialogElement | null) => {
+    dialogo.current = elemento;
+    abrirDialogo(elemento);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -353,10 +359,7 @@ export const PagosPage = () => {
           onClose={() => {
             setModal(undefined);
           }}
-          ref={(elemento) => {
-            dialogo.current = elemento;
-            abrirDialogo(elemento);
-          }}
+          ref={montarDialogo}
         >
           <button
             aria-label="Cerrar"
@@ -457,7 +460,9 @@ export const PagosPage = () => {
               <button className="pagos-secondary" disabled={saving} onClick={cerrar} type="button">
                 CANCELAR
               </button>
-              <button className="pagos-primary" disabled={saving} type="submit">
+              {/* aria-disabled, no disabled: un botón deshabilitado pierde el foco y
+                  close() ya no lo devuelve. El doble envío lo frena `enviando`. */}
+              <button aria-disabled={saving} className="pagos-primary" type="submit">
                 {saving ? "GUARDANDO..." : "GUARDAR"}
               </button>
             </div>
