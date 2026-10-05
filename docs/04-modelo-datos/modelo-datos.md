@@ -8,7 +8,9 @@ Instructor, Vehículo, Mantenimiento y Pago.
 
 ![Modelo Entidad-Relación del sistema](assets/modelo-er.png)
 
-Reproducción del mismo modelo en Mermaid (versionable en texto):
+La imagen es la versión original del modelo. El diagrama Mermaid siguiente es
+la versión actualizada (versionable en texto) e incluye cambios posteriores,
+como `instructor.fecha_ingreso`:
 
 ```mermaid
 erDiagram
@@ -48,6 +50,7 @@ erDiagram
         varchar nombre
         varchar especialidad
         varchar telefono
+        date fecha_ingreso
     }
     VEHICULO {
         int id_vehiculo PK
@@ -117,7 +120,7 @@ erDiagram
 | id_instructor | int | FK → Instructor | Instructor asignado. |
 | id_vehiculo | int | FK → Vehículo | Vehículo utilizado. |
 | fecha_hora | datetime | | Fecha y hora programada. |
-| estado | varchar | | Estado de la clase (p. ej. programada, impartida). |
+| estado | varchar | | Estado de la clase: `programada`, `impartida` o `cancelada`. |
 
 ### Instructor
 | Campo | Tipo | Clave | Descripción |
@@ -126,15 +129,16 @@ erDiagram
 | nombre | varchar | | Nombre completo. |
 | especialidad | varchar | | Especialidad (p. ej. autopistas, ciudad). |
 | telefono | varchar | | Teléfono de contacto. |
+| fecha_ingreso | date (nullable) | | Fecha de ingreso a la autoescuela (antigüedad). Opcional; no puede ser futura. Migración `0002_instructor_fecha_ingreso`. |
 
 ### Vehículo
 | Campo | Tipo | Clave | Descripción |
 |-------|------|-------|-------------|
 | id_vehiculo | int | PK | Identificador del vehículo. |
-| placa | varchar | | Placa. |
+| placa | varchar | | Placa (única). |
 | modelo | varchar | | Modelo. |
 | kilometraje | int | | Kilometraje actual. |
-| estado | varchar | | Estado (p. ej. activo, en mantenimiento). |
+| estado | varchar | | Estado: `activo`, `en_mantenimiento` o `baja`. |
 
 ### Mantenimiento
 | Campo | Tipo | Clave | Descripción |
@@ -153,6 +157,6 @@ erDiagram
 | monto | decimal | | Monto del abono. |
 | fecha | date | | Fecha del pago. |
 | metodo | varchar | | Método (p. ej. efectivo, tarjeta, transferencia). |
-| estado | varchar | | Estado (p. ej. pagado, pendiente, vencido). |
+| estado | varchar | | Estado guardado: `pagado` o `pendiente` (la API no acepta `vencido`; las filas del seed con `vencido` guardado se tratan igual). `vencido` se deriva de un `pendiente` con fecha pasada. |
 
 **Anterior:** [← Arquitectura](../03-arquitectura/diseno-tecnico.md) · **Siguiente:** [Mockups →](../05-diseno-ui/mockups.md)
