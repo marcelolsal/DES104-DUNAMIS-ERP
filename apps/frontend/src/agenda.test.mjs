@@ -5,7 +5,14 @@ process.env.TZ = "America/El_Salvador"; // antes de crear cualquier Date
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { addDays, enSemana, horasDeGrilla, mondayOf, siguienteFranja } from "./agenda.ts";
+import {
+  addDays,
+  enSemana,
+  horasDeGrilla,
+  mondayOf,
+  siguienteFranja,
+  transiciones,
+} from "./agenda.ts";
 
 const seed = new URL("../../backend/src/shared/db/seed-data/clase.jsonl", import.meta.url);
 const fechas = readFileSync(seed, "utf8")
@@ -63,4 +70,15 @@ test("siguienteFranja: siempre futura y dentro de 07–18", () => {
     assert.deepEqual(siguienteFranja(ahora), esperada);
     assert.ok(siguienteFranja(ahora) > ahora);
   }
+});
+
+test("transiciones: impartir solo si ya empezó; impartida/cancelada vuelven a programada", () => {
+  const ahora = new Date(2026, 0, 5, 10, 0);
+  const antes = new Date(2026, 0, 5, 9, 0);
+  const despues = new Date(2026, 0, 5, 11, 0);
+  assert.deepEqual(transiciones("programada", antes, ahora), ["impartida", "cancelada"]);
+  assert.deepEqual(transiciones("programada", ahora, ahora), ["impartida", "cancelada"]);
+  assert.deepEqual(transiciones("programada", despues, ahora), ["cancelada"]);
+  assert.deepEqual(transiciones("impartida", antes, ahora), ["programada"]);
+  assert.deepEqual(transiciones("cancelada", despues, ahora), ["programada"]);
 });
