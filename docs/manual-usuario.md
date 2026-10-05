@@ -1,8 +1,8 @@
 # Manual de usuario — DUNAMIS ERP
 
 Guía para la secretaría y la administración de la autoescuela. Describe las
-pantallas disponibles en el sistema y aclara qué acciones todavía no se pueden
-hacer desde la interfaz.
+pantallas disponibles en el sistema, qué se puede hacer en cada una y los
+mensajes que muestra.
 
 ## Índice
 
@@ -47,15 +47,17 @@ Una vez dentro, la barra de pestañas muestra los módulos: **Estudiantes**,
 
 - Los avisos de éxito (verde) o de error (rojo) aparecen arriba del contenido
   del módulo; los errores al guardar un formulario en ventana aparecen dentro de
-  ella. En **Estudiantes** es distinto: el error al guardar se muestra en la
-  página, detrás de la ventana.
-- Las eliminaciones siempre piden confirmación antes de ejecutarse.
+  ella (también en **Estudiantes** y **Clases**).
+- Las eliminaciones siempre piden confirmación antes de ejecutarse. En
+  **Clases**, cancelar una clase o devolver a programada una clase impartida
+  también piden confirmación.
 
 ## 3. Estudiantes
 
 ### Consultar
 
-La tabla muestra, por estudiante: **nombre** y correo, **curso** (paquete),
+La tabla muestra, por estudiante: **nombre**, correo y número de estudiante
+(«#id», útil para distinguir homónimos), **curso** (paquete),
 **instructor** (el de su clase más reciente, o «Sin asignar»), **horas**
 completadas con barra de progreso, **estado** y fecha de **ingreso**.
 
@@ -63,25 +65,31 @@ completadas con barra de progreso, **estado** y fecha de **ingreso**.
 - **Filtrar:** elige **Todos**, **Activo** o **Graduado**.
 
 El estado y el progreso se calculan solos: cada clase marcada como impartida
-suma una hora; al completar las horas del paquete el estudiante pasa a
-**Graduado**.
-
-> Como la agenda todavía no permite marcar clases como impartidas, las horas,
-> el progreso y el estado solo cambian con datos cargados fuera de la pantalla.
+en la [agenda](#7-clases-agenda-semanal) suma una hora; al completar las horas
+del paquete el estudiante pasa a **Graduado**. Si una clase impartida vuelve a
+programada o se elimina, esa hora se descuenta.
 
 ### Inscribir un estudiante
 
 1. Pulsa **+ NUEVO ESTUDIANTE**.
 2. Completa todos los campos: **Nombre**, **Correo**, **DUI**, **Teléfono**,
    **Contacto de emergencia**, **Curso** (paquete contratado) y **Fecha de
-   ingreso** (por defecto, hoy).
+   ingreso** (por defecto, hoy según la fecha de El Salvador).
 3. Pulsa **GUARDAR**. Para salir sin guardar, pulsa **CANCELAR** o la **×**.
+
+Si algo falla al guardar (p. ej. «El paquete N no existe»), el error aparece
+dentro de la ventana y los datos escritos se conservan.
 
 ### Editar un estudiante
 
 Pulsa **EDITAR** en su fila, cambia los datos y pulsa **GUARDAR**.
 
-> Desde la pantalla no se eliminan estudiantes.
+### Eliminar un estudiante
+
+Pulsa **ELIMINAR** en su fila y confirma («¿Eliminar al estudiante “Nombre”?
+Esta acción no se puede deshacer.»). Solo se puede eliminar un estudiante sin
+clases ni pagos registrados; si tiene alguno, el sistema no lo borra y muestra
+en la página «No se puede eliminar un alumno con clases o pagos asociados».
 
 ## 4. Paquetes
 
@@ -126,8 +134,10 @@ La tabla muestra **placa**, **vehículo** (modelo), **kilometraje** y **estado**
 La ventana se cierra con **Cancelar**, la **×**, la tecla **Esc** o un clic
 fuera de ella.
 
-> Solo los vehículos **Disponibles** pueden asignarse a clases. Cambia el estado
-> a «En mantenimiento» o «De baja» para que no se ofrezcan al programar.
+> Al programar una clase solo se pueden elegir los vehículos **Disponibles**; los
+> demás aparecen deshabilitados con la nota «(Mantenimiento)» o «(Baja)». Al
+> editar una clase se puede conservar el vehículo que ya tenía. Cambia el estado
+> a «En mantenimiento» o «De baja» para que no se ofrezca al programar.
 
 ### Detalle e historial de mantenimiento
 
@@ -166,6 +176,7 @@ se pueden **editar** y **eliminar** registros.
   siguiente.
 - Cada bloque muestra horario, estudiante, instructor y placa. El color indica
   el estado: **Programada**, **Impartida** o **Cancelada** (ver la leyenda).
+  Haz clic en un bloque para abrir la clase.
 - **Filtros:** **Instructor**, **Vehículo**, **Estado** y **Buscar** (alumno,
   instructor o vehículo). Arriba a la derecha se ve cuántas clases cumplen los
   filtros.
@@ -176,19 +187,73 @@ se pueden **editar** y **eliminar** registros.
    ese día y hora). El botón propone la siguiente hora en punto dentro del
    horario de 07:00 a 18:00, sin revisar disponibilidad; si choca con otra
    clase, el sistema avisa al guardar.
-2. Elige **Estudiante**, **Instructor** y **Vehículo**. Los vehículos en
-   mantenimiento o de baja aparecen deshabilitados.
+2. Elige **Estudiante**, **Instructor** y **Vehículo**. Si dos estudiantes se
+   llaman igual, la lista los muestra como «Nombre — #id» (el mismo número de
+   la tabla de Estudiantes). Los vehículos en mantenimiento o de baja aparecen
+   deshabilitados.
 3. Ajusta **Fecha y hora** si hace falta y pulsa **GUARDAR CLASE**.
 
-La clase queda como **Programada** y la agenda salta a su semana. La duración
-de cada clase se indica en la leyenda (60 minutos por defecto).
+La clase queda como **Programada** («Clase programada correctamente.») y la
+agenda salta a su semana. La duración de cada clase se indica en la leyenda (60
+minutos por defecto).
 
 Si el instructor o el vehículo ya tienen otra clase en esa franja, el sistema
-no la guarda y muestra el aviso de **solape**: elige otra hora, otro instructor
-u otro vehículo.
+no la guarda y muestra el aviso de **solape** dentro de la ventana, p. ej.
+«Solape: el instructor ya tiene una clase en esa franja» o «Solape: el
+instructor y el vehículo ya tienen una clase en esa franja». Elige otra hora,
+otro instructor u otro vehículo. Las clases canceladas no ocupan franja.
 
-> Por ahora la pantalla solo permite programar clases; editar, cancelar o
-> marcar una clase como impartida todavía no está disponible desde la agenda.
+### Abrir y editar una clase
+
+Al hacer clic en un bloque se abre **EDITAR CLASE**, con el estado actual
+arriba (p. ej. «CLASE PROGRAMADA»). Además del formulario, la ventana muestra
+los botones de estado que correspondan y **ELIMINAR**.
+
+- **Solo una clase programada se edita.** Cambia estudiante, instructor,
+  vehículo o fecha y hora y pulsa **GUARDAR CLASE** («Clase actualizada.»). El
+  solape se vuelve a validar al guardar. Si el vehículo asignado ya no está
+  disponible, se puede conservar al editar.
+- Una clase **impartida** o **cancelada** se muestra con el formulario
+  bloqueado y el aviso «Vuelve a programada para editar.».
+- **CERRAR** o la **×** salen sin guardar.
+
+### Cambiar el estado
+
+Los botones de estado cambian solo el estado guardado de la clase; no aplican
+cambios del formulario que no se hayan guardado.
+
+| Estado actual              | Botones disponibles                      |
+| -------------------------- | ---------------------------------------- |
+| Programada, aún no empieza | **CANCELAR CLASE**                       |
+| Programada, ya empezó      | **MARCAR IMPARTIDA**, **CANCELAR CLASE** |
+| Impartida                  | **VOLVER A PROGRAMADA**                  |
+| Cancelada                  | **VOLVER A PROGRAMADA**                  |
+
+- **MARCAR IMPARTIDA** («Clase marcada como impartida.») solo aparece cuando
+  ya llegó la hora de inicio; antes se ve el aviso «Se podrá marcar como
+  impartida cuando llegue su hora.». Cada clase impartida suma una hora al
+  progreso del estudiante y su duración (60 minutos por defecto) a las horas
+  del instructor. Si se intenta impartir
+  una clase futura, el sistema la rechaza con «No se puede marcar como
+  impartida una clase que aún no empieza».
+- **CANCELAR CLASE** pide confirmación (p. ej. «¿Cancelar la clase de Ana
+  López del 06-oct a las 11:00?») y deja la clase como **Cancelada** («Clase cancelada.»).
+  La franja queda libre.
+- **VOLVER A PROGRAMADA** («La clase volvió a programada.») corrige un estado
+  marcado por error. Desde **Impartida** pide confirmación y avisa «Se
+  descontará del progreso del alumno y de las horas del instructor.»; desde
+  **Cancelada** no pide confirmación. En ambos casos el sistema vuelve a validar
+  el solape: si en esa franja ya hay otra clase del instructor o del vehículo,
+  la clase no cambia de estado y aparece el aviso de solape.
+
+### Eliminar una clase
+
+Pulsa **ELIMINAR** y confirma («¿Eliminar definitivamente la clase de …? Para
+conservarla en el historial, mejor cancélala.»). Si la clase ya estaba
+impartida, el aviso agrega que se descontará del progreso del alumno y de las
+horas del instructor. Para dejar constancia de una clase que no se dio, usa
+**CANCELAR CLASE** en lugar de eliminarla. Al confirmar aparece «Clase
+eliminada.» y la clase desaparece de la agenda.
 
 ## 8. Instructores
 
@@ -201,10 +266,9 @@ Cada instructor aparece en una tarjeta con su **nombre**, **especialidad**,
 - **Estudiantes:** alumnos distintos con al menos una clase no cancelada con ese
   instructor.
 - **Horas impartidas:** clases marcadas como impartidas multiplicadas por la
-  duración de la clase (60 minutos por defecto).
-
-> Como la agenda todavía no permite marcar clases como impartidas, las horas
-> impartidas solo cambian con datos cargados fuera de la pantalla.
+  duración de la clase (60 minutos por defecto). Suben al marcar una clase
+  como impartida en la [agenda](#7-clases-agenda-semanal) y bajan si esa clase
+  vuelve a programada o se elimina.
 
 Mientras las métricas cargan se ve «…»; si no se pudieron obtener aparece «—» y
 el aviso «No se pudieron cargar las métricas.».
@@ -359,15 +423,19 @@ en línea ni muestra datos de la base de datos.
 
 ## 12. Mensajes y errores frecuentes
 
-| Mensaje                                                                  | Qué significa / qué hacer                                                |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| No se puede eliminar un paquete asignado a alumnos                       | Hay estudiantes con ese paquete. Cámbiales el curso antes de eliminarlo. |
-| No se puede eliminar un vehículo con clases o mantenimientos asociados   | Tiene historial. Márcalo como **De baja** en lugar de eliminarlo.        |
-| No se puede eliminar un instructor con clases asociadas                  | Tiene clases registradas; no se puede borrar.                            |
-| Datos inválidos — fecha_ingreso: La fecha de ingreso no puede ser futura | Elige una fecha de ingreso de hoy o anterior, o déjala vacía.            |
-| El abono de X excede el saldo pendiente del alumno (Y)                   | Registra un monto igual o menor al saldo indicado.                       |
-| El rango no puede superar 366 días                                       | Acorta el periodo de Finanzas a un año como máximo.                      |
-| Ya existe un vehículo con esa placa                                      | La placa ya está registrada. Revisa el listado.                          |
-| Solape: el instructor / el vehículo ya tiene una clase en esa franja     | Cambia la hora, el instructor o el vehículo.                             |
-| Mensaje con nombres de campos (p. ej. `correo: ...`)                     | Algún dato no tiene el formato esperado. Corrige el campo indicado.      |
-| Invalid login credentials                                                | Correo o contraseña incorrectos, o la cuenta no existe.                  |
+| Mensaje                                                                  | Qué significa / qué hacer                                                                          |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| No se puede eliminar un paquete asignado a alumnos                       | Hay estudiantes con ese paquete. Cámbiales el curso antes de eliminarlo.                           |
+| No se puede eliminar un vehículo con clases o mantenimientos asociados   | Tiene historial. Márcalo como **De baja** en lugar de eliminarlo.                                  |
+| No se puede eliminar un instructor con clases asociadas                  | Tiene clases registradas; no se puede borrar.                                                      |
+| No se puede eliminar un alumno con clases o pagos asociados              | El estudiante tiene clases o pagos registrados; no se puede borrar.                                |
+| No se puede marcar como impartida una clase que aún no empieza           | Espera a la hora de inicio de la clase para marcarla.                                              |
+| El paquete N / alumno N / instructor N / vehículo N no existe            | El registro elegido ya no existe (p. ej. se borró en otra sesión). Recarga la página y elige otro. |
+| Datos inválidos — fecha_ingreso: La fecha de ingreso no puede ser futura | Elige una fecha de ingreso de hoy o anterior, o déjala vacía.                                      |
+| El abono de X excede el saldo pendiente del alumno (Y)                   | Registra un monto igual o menor al saldo indicado.                                                 |
+| El rango no puede superar 366 días                                       | Acorta el periodo de Finanzas a un año como máximo.                                                |
+| Ya existe un vehículo con esa placa                                      | La placa ya está registrada. Revisa el listado.                                                    |
+| Solape: el instructor / el vehículo ya tiene una clase en esa franja     | Cambia la hora, el instructor o el vehículo.                                                       |
+| Solape: el instructor y el vehículo ya tienen una clase en esa franja    | Ambos están ocupados. Cambia la hora, o el instructor y el vehículo.                               |
+| Mensaje con nombres de campos (p. ej. `correo: ...`)                     | Algún dato no tiene el formato esperado. Corrige el campo indicado.                                |
+| Invalid login credentials                                                | Correo o contraseña incorrectos, o la cuenta no existe.                                            |
