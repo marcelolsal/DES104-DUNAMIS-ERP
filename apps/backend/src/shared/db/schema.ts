@@ -34,6 +34,7 @@ export const instructor = pgTable("instructor", {
   nombre: varchar("nombre", { length: 160 }).notNull(),
   especialidad: varchar("especialidad", { length: 120 }).notNull(),
   telefono: varchar("telefono", { length: 30 }).notNull(),
+  fecha_ingreso: date("fecha_ingreso"),
 });
 
 export const vehiculo = pgTable("vehiculo", {
