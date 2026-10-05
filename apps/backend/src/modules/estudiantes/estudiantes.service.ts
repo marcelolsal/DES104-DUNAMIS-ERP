@@ -6,6 +6,22 @@ const conDependencias = () =>
     statusCode: 409,
   });
 
+// FK de Postgres (23503). Al escribir un alumno la única FK es id_paquete.
+const esViolacionFk = (error: unknown) =>
+  typeof error === "object" && error !== null && "code" in error && error.code === "23503";
+
+// Paquete inexistente → 400 legible en vez de un 500 por la FK.
+const conPaqueteValido = async <T>(datos: NuevoAlumno, escribir: () => Promise<T>) => {
+  try {
+    return await escribir();
+  } catch (error) {
+    if (!esViolacionFk(error)) throw error;
+    throw Object.assign(new Error(`El paquete ${String(datos.id_paquete)} no existe`), {
+      statusCode: 400,
+    });
+  }
+};
+
 // Reglas de negocio. No conoce req/res ni la BD directamente.
 export const estudiantesService = {
   listar: () => estudiantesRepository.listar(),
@@ -56,10 +72,11 @@ export const estudiantesService = {
     return alumno;
   },
 
-  inscribir: (datos: NuevoAlumno) => estudiantesRepository.crear(datos),
+  inscribir: (datos: NuevoAlumno) =>
+    conPaqueteValido(datos, () => estudiantesRepository.crear(datos)),
 
   actualizar: async (id: number, datos: NuevoAlumno) => {
-    const alumno = await estudiantesRepository.actualizar(id, datos);
+    const alumno = await conPaqueteValido(datos, () => estudiantesRepository.actualizar(id, datos));
     if (!alumno) throw Object.assign(new Error("Alumno no encontrado"), { statusCode: 404 });
     return alumno;
   },
@@ -71,10 +88,8 @@ export const estudiantesService = {
     try {
       await estudiantesRepository.eliminar(id);
     } catch (error) {
-      // FK de Postgres (23503): cubre la carrera entre la comprobación y el borrado.
-      const esFk =
-        typeof error === "object" && error !== null && "code" in error && error.code === "23503";
-      throw esFk ? conDependencias() : error;
+      // FK (23503): cubre la carrera entre la comprobación y el borrado.
+      throw esViolacionFk(error) ? conDependencias() : error;
     }
   },
 };

@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import type { NuevoAlumno } from "@dunamis/contracts";
+import { idAlumnoParamsSchema, type NuevoAlumno } from "@dunamis/contracts";
 import { estudiantesService } from "./estudiantes.service.js";
 
 // Traduce HTTP ↔ negocio. No toca la BD.
@@ -9,7 +9,7 @@ export const estudiantesController = {
   paquetes: async () => estudiantesService.paquetes(),
 
   obtener: async (req: FastifyRequest<{ Params: { id: string } }>) =>
-    estudiantesService.obtener(Number(req.params.id)),
+    estudiantesService.obtener(idAlumnoParamsSchema.parse(req.params).id),
 
   inscribir: async (req: FastifyRequest<{ Body: NuevoAlumno }>, reply: FastifyReply) => {
     const alumno = await estudiantesService.inscribir(req.body);
@@ -17,7 +17,7 @@ export const estudiantesController = {
   },
 
   actualizar: async (req: FastifyRequest<{ Params: { id: string }; Body: NuevoAlumno }>) =>
-    estudiantesService.actualizar(Number(req.params.id), req.body),
+    estudiantesService.actualizar(idAlumnoParamsSchema.parse(req.params).id, req.body),
 
   eliminar: async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     const id = Number(req.params.id);
