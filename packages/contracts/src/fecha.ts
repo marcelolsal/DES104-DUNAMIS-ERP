@@ -8,7 +8,9 @@ export const fechaPayloadSchema = z
     const anio = Number(fecha.slice(0, 4));
     const mes = Number(fecha.slice(5, 7));
     const dia = Number(fecha.slice(8, 10));
-    const fechaUtc = new Date(Date.UTC(anio, mes - 1, dia));
+    // setUTCFullYear y no Date.UTC: este mapea los años 0–99 a 1900–1999.
+    const fechaUtc = new Date(0);
+    fechaUtc.setUTCFullYear(anio, mes - 1, dia);
     return (
       anio >= 1 &&
       fechaUtc.getUTCFullYear() === anio &&

@@ -280,3 +280,14 @@ test("GET cuentas por cobrar: solo alumnos con saldo", async () => {
     [[1, 150]],
   );
 });
+
+test("fila de la BD fuera de contrato (monto negativo) → 500 sin filtrar detalles", async () => {
+  const { parseSalida } = await import("../../shared/db/salida.ts");
+  const { pagoListadoSchema } = await import("@dunamis/contracts");
+  pagosRepository.listar.mock.mockImplementation(async () => [
+    parseSalida(pagoListadoSchema, fila(1, -300)),
+  ]);
+  const res = await pedir("GET", "/api/pagos");
+  assert.equal(res.statusCode, 500);
+  assert.deepEqual(res.json(), { error: "Error interno" });
+});

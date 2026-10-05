@@ -6,12 +6,13 @@ import {
   type Instructor,
 } from "@dunamis/contracts";
 import { db } from "../../shared/db/client.js";
+import { parseSalida } from "../../shared/db/salida.js";
 import { instructor, clase } from "../../shared/db/schema.js";
 
 // Drizzle devuelve `date` como "YYYY-MM-DD"; el contrato la expone como Date
 // (medianoche UTC), igual que pagos y mantenimientos.
 const aInstructor = (registro: typeof instructor.$inferSelect): Instructor =>
-  instructorSchema.parse(registro);
+  parseSalida(instructorSchema, registro);
 
 // Única capa que toca la BD (Drizzle). ADR-0004.
 export const instructoresRepository = {

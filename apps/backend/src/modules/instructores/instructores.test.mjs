@@ -80,3 +80,14 @@ test("fecha de ingreso inválida o futura → 400 y no se guarda", async () => {
   assert.equal(instructoresRepository.crear.mock.callCount(), 0);
   assert.equal(instructoresRepository.actualizar.mock.callCount(), 0);
 });
+
+test("fila de la BD fuera de contrato → 500 sin filtrar detalles; id inválido → 400", async () => {
+  const { parseSalida } = await import("../../shared/db/salida.ts");
+  mock.method(instructoresRepository, "obtener", async () =>
+    parseSalida(instructorSchema, { ...datos, id_instructor: 1, nombre: null }),
+  );
+  const res = await pedir("GET", "/api/instructores/1");
+  assert.equal(res.statusCode, 500);
+  assert.deepEqual(res.json(), { error: "Error interno" });
+  assert.equal((await pedir("GET", "/api/instructores/abc")).statusCode, 400);
+});
