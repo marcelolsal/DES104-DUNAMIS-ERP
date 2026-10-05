@@ -181,3 +181,13 @@ test("workflow_dispatch → todo true", () => {
     frontend: true,
   });
 });
+
+test("detect falla cerrado fuera de main, antes del checkout", () => {
+  const job = yml.slice(yml.indexOf("  detect:"), yml.indexOf("  migrate:"));
+  const guard = job.indexOf("if: ${{ github.ref != 'refs/heads/main' }}");
+  assert.notEqual(guard, -1, "detect sin guard de main");
+  const checkout = job.indexOf("uses: actions/checkout");
+  assert.ok(guard < checkout, "el guard debe ir antes del checkout");
+  assert.match(job.slice(guard, checkout), /exit 1/);
+  assert.ok(!job.includes("fetch-depth"), "fetch-depth no debe estar");
+});

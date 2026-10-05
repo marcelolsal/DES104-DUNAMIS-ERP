@@ -34,6 +34,8 @@ jobs:
   #    paths-filter compara contra la rama por defecto (develop) → 0 cambios.
   #    Dispatch o `before` en ceros (rama nueva): el filtro no corre y el
   #    `|| 'true'` deja todas las etapas en true.
+  #    Solo desde main: dispatch desde otra rama falla `detect` y corta todo.
+  #    Tras un deploy fallido o cancelado → Actions → Run workflow en main (despliega todo).
   detect:
     runs-on: ubuntu-latest
     outputs:
@@ -41,9 +43,12 @@ jobs:
       backend: ${{ steps.filter.outputs.backend || 'true' }}
       frontend: ${{ steps.filter.outputs.frontend || 'true' }}
     steps:
+      - name: Solo desde main
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: |
+          echo "::error::Deploy solo desde main (ref=${{ github.ref }})"
+          exit 1
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: dorny/paths-filter@v3
         id: filter
         if: ${{ github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000' }}
