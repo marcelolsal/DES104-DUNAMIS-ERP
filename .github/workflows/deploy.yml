@@ -18,6 +18,8 @@ name: Deploy a producción (ordenado)
 on:
   push:
     branches: [main]
+  # Manual (Actions → Deploy → Run workflow): corre TODAS las etapas.
+  workflow_dispatch:
 
 concurrency:
   group: deploy-prod
@@ -28,17 +30,25 @@ jobs:
   #    Cada etapa se activa con su flag; el orden y el fail-fast se preservan
   #    con `if: !failure() && !cancelled() && <flag>` (una etapa saltada NO es
   #    fallo, así la siguiente sí corre aunque la anterior se haya salteado).
+  #    Push: compara contra el commit previo de main (`before`); sin `base`,
+  #    paths-filter compara contra la rama por defecto (develop) → 0 cambios.
+  #    Dispatch o `before` en ceros (rama nueva): el filtro no corre y el
+  #    `|| 'true'` deja todas las etapas en true.
   detect:
     runs-on: ubuntu-latest
     outputs:
-      migrations: ${{ steps.filter.outputs.migrations }}
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
+      migrations: ${{ steps.filter.outputs.migrations || 'true' }}
+      backend: ${{ steps.filter.outputs.backend || 'true' }}
+      frontend: ${{ steps.filter.outputs.frontend || 'true' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: dorny/paths-filter@v3
         id: filter
+        if: ${{ github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000' }}
         with:
+          base: ${{ github.event.before }}
           filters: |
             migrations:
               - 'apps/backend/src/shared/db/migrations/**'

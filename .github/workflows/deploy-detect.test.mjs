@@ -108,3 +108,76 @@ test("cambio ajeno (docs) → nada corre", () => {
     frontend: false,
   });
 });
+
+// --- Trigger / base del filtro ---------------------------------------------
+// Simula el job `detect` completo: si el step `filter` corre (push con
+// `before` real) usa routeFor; si no (dispatch / before en ceros), sus
+// outputs quedan vacíos y el `|| 'true'` de cada output los pone en true.
+const ZERO = "0".repeat(40);
+
+function filterRuns({ event_name, before }) {
+  return event_name === "push" && before !== ZERO;
+}
+
+function detect(event, changed) {
+  const step = filterRuns(event) ? routeFor(changed) : {};
+  const out = {};
+  for (const g of Object.keys(filters)) {
+    const raw = g in step ? String(step[g]) : ""; // vacío si el step se saltó
+    out[g] = (raw || "true") === "true";
+  }
+  return out;
+}
+
+test("workflow: dispatch habilitado, base = before, fallback a true y fail-fast", () => {
+  assert.match(yml, /^on:\n(?:.*\n)*?\s+workflow_dispatch:/m);
+  assert.match(yml, /base: \$\{\{ github\.event\.before \}\}/);
+  assert.ok(
+    yml.includes(
+      `if: \${{ github.event_name == 'push' && github.event.before != '${ZERO}' }}`,
+    ),
+    "el step filter debe correr solo en push con before real",
+  );
+  for (const g of ["migrations", "backend", "frontend"]) {
+    assert.ok(
+      yml.includes(`${g}: \${{ steps.filter.outputs.${g} || 'true' }}`),
+      `output ${g} sin fallback a 'true'`,
+    );
+    assert.ok(
+      yml.includes(
+        `if: \${{ !failure() && !cancelled() && needs.detect.outputs.${g} == 'true' }}`,
+      ),
+      `etapa de ${g} sin fail-fast`,
+    );
+  }
+});
+
+test("push normal → enruta según archivos cambiados vs before", () => {
+  const ev = { event_name: "push", before: "abc123" };
+  assert.deepEqual(detect(ev, ["apps/frontend/x.tsx"]), {
+    migrations: false,
+    backend: false,
+    frontend: true,
+  });
+  assert.deepEqual(detect(ev, ["docs/README.md"]), {
+    migrations: false,
+    backend: false,
+    frontend: false,
+  });
+});
+
+test("push con before en ceros (rama nueva) → todo true", () => {
+  assert.deepEqual(detect({ event_name: "push", before: ZERO }, []), {
+    migrations: true,
+    backend: true,
+    frontend: true,
+  });
+});
+
+test("workflow_dispatch → todo true", () => {
+  assert.deepEqual(detect({ event_name: "workflow_dispatch" }, []), {
+    migrations: true,
+    backend: true,
+    frontend: true,
+  });
+});
