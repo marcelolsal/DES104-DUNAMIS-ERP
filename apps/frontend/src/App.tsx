@@ -59,6 +59,11 @@ export const App = () => {
 
   useEffect(() => {
     let active = true;
+    // ponytail: tope fijo de 8 s; si Supabase no responde (token vencido + red colgada) se
+    // muestra la vista pública. Hacerlo configurable si 8 s resulta corto en redes lentas.
+    const tope = window.setTimeout(() => {
+      if (active) setAuthLoading(false);
+    }, 8000);
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       setSession(data.session);
@@ -66,12 +71,19 @@ export const App = () => {
     }).catch((_error: unknown) => {
       if (active) setAuthLoading(false);
     });
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      // Sesión nueva: descarta errores de la sesión anterior (p. ej. un signOut fallido).
+      if (event === "SIGNED_IN") setError(undefined);
+      // El #login del formulario no debe quedar en la URL dentro de la app.
+      if (nextSession && window.location.hash === "#login") {
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
       setSession(nextSession);
       setAuthLoading(false);
     });
     return () => {
       active = false;
+      window.clearTimeout(tope);
       data.subscription.unsubscribe();
     };
   }, []);
