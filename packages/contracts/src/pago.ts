@@ -7,6 +7,10 @@ const INT4_MAX = 2_147_483_647;
 export const metodoPago = z.enum(["efectivo", "tarjeta", "transferencia"]);
 export const estadoPago = z.enum(["pagado", "pendiente", "vencido"]);
 export type EstadoPago = z.infer<typeof estadoPago>;
+// "vencido" lo deriva el backend (pendiente con fecha pasada); no se guarda.
+const estadoEscritura = z.enum(["pagado", "pendiente"]);
+// Ids de ruta/query: solo dígitos (z.coerce aceptaría "0x10" o "1e3").
+const idTexto = z.string().regex(/^\d+$/u).pipe(z.coerce.number().int().positive().max(INT4_MAX));
 
 const pagoPayloadSchema = z.object({
   id_alumno: z.number().int().positive().max(INT4_MAX),
@@ -31,20 +35,22 @@ export type PagoListado = z.infer<typeof pagoListadoSchema>;
 
 // Payloads de escritura: el id lo genera la base de datos. Registrar un abono
 // es, por defecto, registrar dinero ya recibido.
-export const nuevoPagoSchema = pagoPayloadSchema.extend({ estado: estadoPago.default("pagado") });
+export const nuevoPagoSchema = pagoPayloadSchema.extend({
+  estado: estadoEscritura.default("pagado"),
+});
 export type NuevoPago = z.infer<typeof nuevoPagoSchema>;
 
 export const actualizarPagoSchema = nuevoPagoSchema;
 export type ActualizarPago = z.infer<typeof actualizarPagoSchema>;
 
 export const listarPagosQuerySchema = z.object({
-  id_alumno: z.coerce.number().int().positive().max(INT4_MAX).optional(),
+  id_alumno: idTexto.optional(),
   estado: estadoPago.optional(),
 });
 export type ListarPagosQuery = z.infer<typeof listarPagosQuerySchema>;
 
 export const idPagoParamsSchema = z.object({
-  id: z.coerce.number().int().positive().max(INT4_MAX),
+  id: idTexto,
 });
 
 // Cuenta por cobrar de un alumno: precio de su paquete menos lo ya pagado.

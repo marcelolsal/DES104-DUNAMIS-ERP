@@ -8,6 +8,7 @@ import {
   type PagoListado,
 } from "@dunamis/contracts";
 import { db } from "../../shared/db/client.js";
+import { parseSalida } from "../../shared/db/salida.js";
 import { alumno, pago, paquete } from "../../shared/db/schema.js";
 
 export type Transaccion = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -16,11 +17,11 @@ type Ejecutor = typeof db | Transaccion;
 // PostgreSQL numeric se representa como string en Drizzle. La API conserva el
 // contrato compartido, que expone monto y precio como number y fecha como Date.
 const aPago = (registro: typeof pago.$inferSelect): Pago =>
-  pagoSchema.parse({ ...registro, monto: Number(registro.monto) });
+  parseSalida(pagoSchema, { ...registro, monto: Number(registro.monto) });
 
 const aPagoListado = (
   registro: typeof pago.$inferSelect & { alumno: string; curso: string },
-): PagoListado => pagoListadoSchema.parse({ ...registro, monto: Number(registro.monto) });
+): PagoListado => parseSalida(pagoListadoSchema, { ...registro, monto: Number(registro.monto) });
 
 const aValoresDePersistencia = (datos: NuevoPago) => ({ ...datos, monto: String(datos.monto) });
 
@@ -43,8 +44,8 @@ export const pagosRepository = {
         .orderBy(desc(pago.fecha), desc(pago.id_pago))
     ).map(aPagoListado),
 
-  obtener: (id: number) =>
-    seleccionarPagos(db)
+  obtener: (id: number, ejecutor: Ejecutor = db) =>
+    seleccionarPagos(ejecutor)
       .where(eq(pago.id_pago, id))
       .then((resultados) => (resultados[0] ? aPagoListado(resultados[0]) : null)),
 

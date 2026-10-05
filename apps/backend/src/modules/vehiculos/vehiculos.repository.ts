@@ -6,9 +6,11 @@ import {
   type Vehiculo,
 } from "@dunamis/contracts";
 import { db } from "../../shared/db/client.js";
+import { parseSalida } from "../../shared/db/salida.js";
 import { clase, mantenimiento, vehiculo } from "../../shared/db/schema.js";
 
-const aVehiculo = (registro: typeof vehiculo.$inferSelect): Vehiculo => vehiculoSchema.parse(registro);
+const aVehiculo = (registro: typeof vehiculo.$inferSelect): Vehiculo =>
+  parseSalida(vehiculoSchema, registro);
 
 // Única capa que toca la BD (Drizzle). ADR-0004.
 export const vehiculosRepository = {
