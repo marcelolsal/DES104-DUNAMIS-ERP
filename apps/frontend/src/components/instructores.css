@@ -104,6 +104,11 @@
 .inst-acciones .inst-eliminar {
   color: #ff5a4f;
 }
+.inst-acciones button:disabled,
+.student-modal button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
 .inst-estado {
   border: 1px solid #222936;
   color: #8a92a4;

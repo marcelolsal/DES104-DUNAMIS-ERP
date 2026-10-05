@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Instructor } from "@dunamis/contracts";
 import { instructoresApi, type MetricasInstructor } from "../api/instructores.js";
 import { ApiMessage, mensajeDeError } from "./ApiMessage.js";
@@ -19,6 +19,9 @@ export const InstructoresPanel = (): ReactNode => {
   const [success, setSuccess] = useState<string>();
   // undefined = modal cerrado, null = alta, Instructor = edición.
   const [edicion, setEdicion] = useState<Instructor | null>();
+  const [origenModal, setOrigenModal] = useState<HTMLElement | null>(null);
+  const [eliminando, setEliminando] = useState<number>();
+  const botonNuevo = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const cancelacion = new AbortController();
@@ -58,8 +61,9 @@ export const InstructoresPanel = (): ReactNode => {
     setVersion((actual) => actual + 1);
   };
 
-  const abrirModal = (instructor: Instructor | null) => {
+  const abrirModal = (instructor: Instructor | null, origen: HTMLElement) => {
     setEdicion(instructor);
+    setOrigenModal(origen);
     setError(undefined);
     setSuccess(undefined);
   };
@@ -71,12 +75,21 @@ export const InstructoresPanel = (): ReactNode => {
     if (!window.confirm(`¿Eliminar al instructor “${instructor.nombre}”?`)) return;
     setError(undefined);
     setSuccess(undefined);
+    setEliminando(instructor.id_instructor);
     try {
       await instructoresApi.eliminar(instructor.id_instructor);
       setSuccess("Instructor eliminado correctamente.");
       recargar();
     } catch (errorDesconocido) {
       setError(mensajeDeError(errorDesconocido));
+      // Ya lo borró otra sesión: recargar quita la tarjeta fantasma.
+      if (errorDesconocido instanceof Error && errorDesconocido.message.startsWith("API 404")) {
+        recargar();
+      }
+    } finally {
+      setEliminando(undefined);
+      // La tarjeta puede desaparecer: el foco va a un lugar estable.
+      botonNuevo.current?.focus();
     }
   };
 
@@ -89,9 +102,10 @@ export const InstructoresPanel = (): ReactNode => {
         </div>
         <button
           className="primary-button"
+          ref={botonNuevo}
           type="button"
-          onClick={() => {
-            abrirModal(null);
+          onClick={(event) => {
+            abrirModal(null, event.currentTarget);
           }}
         >
           + NUEVO INSTRUCTOR
@@ -155,14 +169,15 @@ export const InstructoresPanel = (): ReactNode => {
                   <button
                     type="button"
                     aria-label={`Editar a ${instructor.nombre}`}
-                    onClick={() => {
-                      abrirModal(instructor);
+                    onClick={(event) => {
+                      abrirModal(instructor, event.currentTarget);
                     }}
                   >
                     EDITAR
                   </button>
                   <button
                     className="inst-eliminar"
+                    disabled={eliminando === instructor.id_instructor}
                     type="button"
                     aria-label={`Eliminar a ${instructor.nombre}`}
                     onClick={() => {
@@ -180,6 +195,7 @@ export const InstructoresPanel = (): ReactNode => {
       {edicion !== undefined && (
         <InstructorModal
           instructor={edicion}
+          origen={origenModal}
           onClose={cerrarModal}
           onSaved={(mensaje) => {
             setSuccess(mensaje);

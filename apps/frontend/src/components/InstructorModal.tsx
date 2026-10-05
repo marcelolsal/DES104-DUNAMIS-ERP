@@ -9,13 +9,15 @@ const NO_VACIO = ".*\\S.*";
 interface Props {
   // null = alta, Instructor = edición.
   instructor: Instructor | null;
+  // Botón que abrió el modal: recibe el foco al cerrar.
+  origen: HTMLElement | null;
   onClose: () => void;
   onSaved: (mensaje: string) => void;
 }
 
 type CampoTexto = "nombre" | "especialidad" | "telefono";
 
-export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactNode => {
+export const InstructorModal = ({ instructor, origen, onClose, onSaved }: Props): ReactNode => {
   const [formulario, setFormulario] = useState(() => ({
     nombre: instructor?.nombre ?? "",
     especialidad: instructor?.especialidad ?? "",
@@ -27,26 +29,39 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
   }));
   const [error, setError] = useState<string>();
   const [guardando, setGuardando] = useState(false);
-  // Se captura en el primer render, antes de que el foco entre al modal.
-  const [focoPrevio] = useState(() => document.activeElement as HTMLElement | null);
   const dialogo = useRef<HTMLElement>(null);
 
   useEffect(() => {
     dialogo.current?.querySelector("input")?.focus();
     return () => {
-      focoPrevio?.focus();
+      origen?.focus();
     };
-  }, [focoPrevio]);
+  }, [origen]);
 
   useEffect(() => {
     const alPulsar = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !guardando) onClose();
+      if (event.key !== "Tab" || !dialogo.current) return;
+      // Tab cicla dentro del modal.
+      const enfocables = [
+        ...dialogo.current.querySelectorAll<HTMLElement>("input, button:not(:disabled)"),
+      ];
+      const primero = enfocables[0];
+      const ultimo = enfocables.at(-1);
+      const actual = document.activeElement;
+      if (!dialogo.current.contains(actual) || (!event.shiftKey && actual === ultimo)) {
+        event.preventDefault();
+        primero?.focus();
+      } else if (event.shiftKey && actual === primero) {
+        event.preventDefault();
+        ultimo?.focus();
+      }
     };
     window.addEventListener("keydown", alPulsar);
     return () => {
       window.removeEventListener("keydown", alPulsar);
     };
-  }, [onClose]);
+  }, [onClose, guardando]);
 
   const guardar = async (event: SyntheticEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -96,7 +111,13 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
         ref={dialogo}
         role="dialog"
       >
-        <button aria-label="Cerrar" className="modal-close" type="button" onClick={onClose}>
+        <button
+          aria-label="Cerrar"
+          className="modal-close"
+          disabled={guardando}
+          type="button"
+          onClick={onClose}
+        >
           ×
         </button>
         <p className="section-kicker">GESTIÓN</p>
@@ -122,7 +143,12 @@ export const InstructorModal = ({ instructor, onClose, onSaved }: Props): ReactN
           </label>
           <ApiMessage error={error} />
           <div className="modal-actions">
-            <button className="secondary-button" type="button" onClick={onClose}>
+            <button
+              className="secondary-button"
+              disabled={guardando}
+              type="button"
+              onClick={onClose}
+            >
               CANCELAR
             </button>
             <button className="primary-button" disabled={guardando} type="submit">
