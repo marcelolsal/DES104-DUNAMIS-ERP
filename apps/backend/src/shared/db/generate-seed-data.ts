@@ -65,10 +65,17 @@ const vehiculos = Array.from({ length: N_VEHICULOS }, (_, i) => ({
   placa: `P${String(100 + i)}-${String(400 + i * 3)}`,
   modelo: `${pick(modelos)} ${randInt(2016, 2023)}`,
   kilometraje: randInt(15_000, 90_000),
-  estado: rnd() < 0.15 ? "en mantenimiento" : "activo",
+  estado: rnd() < 0.15 ? "en_mantenimiento" : "activo",
 }));
 
 // --- Alumnos: inscripciones repartidas en ~14 meses ---
+// "José Beltrán" → "jose.beltran": sin tildes y sin puntos dobles (correo válido).
+const correoBase = (nombre: string) =>
+  nombre
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z]+/g, ".");
 const alumnos = Array.from({ length: N_ALUMNOS }, (_, i) => {
   const nombre = nombreCompleto(i);
   const diasAtras = randInt(5, 430);
@@ -76,7 +83,7 @@ const alumnos = Array.from({ length: N_ALUMNOS }, (_, i) => {
     id_alumno: i + 1,
     nombre,
     dui: `0${String(randInt(1_000_000, 9_999_999))}-${randInt(0, 9)}`,
-    correo: `${nombre.toLowerCase().replace(/[^a-z]/g, ".")}${i}@correo.com`,
+    correo: `${correoBase(nombre)}${i}@correo.com`,
     telefono: `7${String(randInt(100, 899))}-${String(randInt(1000, 9999))}`,
     contacto_emergencia: `7999-${String(1000 + i)}`,
     fecha_inscripcion: ymd(desplazar(-diasAtras)),

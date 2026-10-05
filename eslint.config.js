@@ -14,6 +14,7 @@ export default tseslint.config(
       "**/*.config.js",
       "**/*.config.ts",
       "**/migrations/**",
+      "**/*.test.mjs", // tests con node:test; no forman parte del proyecto TS
     ],
   },
   js.configs.recommended,

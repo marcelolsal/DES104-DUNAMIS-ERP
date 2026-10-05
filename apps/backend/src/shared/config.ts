@@ -1,4 +1,8 @@
+import { config as loadEnv } from "dotenv";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
+
+loadEnv({ path: fileURLToPath(new URL("../../../../.env", import.meta.url)) });
 
 // Valida el entorno al arrancar: si falta algo, el proceso falla claro y temprano.
 const envSchema = z.object({
@@ -8,6 +12,8 @@ const envSchema = z.object({
   SUPABASE_JWT_SECRET: z.string().min(1),
   SUPABASE_BUCKET_EVIDENCIAS: z.string().min(1).default("evidencias"),
   PORT: z.coerce.number().default(3000),
+  // Duración de una clase en minutos: define la "franja" para validar solapes (#17).
+  CLASE_DURACION_MIN: z.coerce.number().int().positive().default(60),
 });
 
 export const config = envSchema.parse(process.env);

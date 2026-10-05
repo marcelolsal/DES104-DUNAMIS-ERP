@@ -1,6 +1,6 @@
 # ADR-0001: Supabase como plataforma única (BD + Auth + Storage)
 
-- **Estado:** Aceptado — la parte de **almacenamiento** fue revisada; ver [ADR-0007](0007-s3-almacenamiento-evidencias.md). La base de datos y la autenticación siguen vigentes.
+- **Estado:** Aceptado — la parte de **almacenamiento** se revisó en [ADR-0007](0007-s3-almacenamiento-evidencias.md), hoy reemplazado por [ADR-0009](0009-supabase-storage-evidencias.md) (vigente: Supabase Storage). La base de datos y la autenticación siguen vigentes.
 - **Fecha:** 2026-08-31
 - **Decisores:** Arquitecto de Software, Backend / DevOps
 

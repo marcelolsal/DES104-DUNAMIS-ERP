@@ -20,6 +20,9 @@ físicos, libros de pagos y grupos de WhatsApp que se usan hoy.
 | 06 | [Gestión del proyecto](06-gestion-proyecto/) | [Cronograma y roles](06-gestion-proyecto/cronograma.md) · [Presupuesto](06-gestion-proyecto/presupuesto.md) |
 | 07 | [Anexos](07-anexos/) | [Declaración de uso de IA](07-anexos/declaracion-ia.md) · [Referencias](07-anexos/referencias.md) |
 | 08 | [Convenciones de código](convenciones-codigo.md) | Estilo y diseño obligatorio para TypeScript, React y Fastify |
+| 09 | [Valor agregado a la empresa](valor-agregado.md) | Valor agregado a la empresa |
+| 10 | [Manual de usuario](manual-usuario.md) | Uso de cada módulo para secretaría y administración |
+| 11 | [Despliegue](despliegue.md) | Pipeline y puesta en marcha (Supabase, Render, Vercel) |
 | — | [Decisiones de arquitectura (ADR)](adr/) | Registro de decisiones técnicas |
 
 ## Equipo

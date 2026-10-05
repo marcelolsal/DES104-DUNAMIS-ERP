@@ -11,7 +11,7 @@ un proyecto académico, la mano de obra es una simulación sin impacto real).
 | Servidor App (Backend / Frontend) | Render / Vercel | Pro / Starter · Node.js (512 MB RAM, 0.5 CPU) | $7.00 | $28.00 |
 | Base de datos relacional | PostgreSQL (Supabase) | Instancia cloud administrada (1 GB storage, RAM dedicada) | $7.00 | $28.00 |
 | Nombre de dominio web | Namecheap / GoDaddy | Dominio `.com` personalizado (`driveproerp.com`) | $1.00 (prorrateado) | $12.00 (anual) |
-| Almacenamiento de archivos | AWS S3 | Contratos / evidencias (tier gratuito / básico) | $0.00 | $0.00 |
+| Almacenamiento de archivos | Supabase Storage | Contratos / evidencias (incluido en el proyecto Supabase) | $0.00 | $0.00 |
 | Herramientas de diseño | Figma | Plan Starter (mockups y prototipado) | $0.00 | $0.00 |
 | **Subtotal infraestructura** | | | **$15.00 / mes** | **$68.00** |
 
