@@ -83,7 +83,7 @@ Studio (panel de la base) en http://127.0.0.1:54323.
 ## Documentación
 
 La documentación completa del proyecto (análisis, procesos BPMN, arquitectura,
-modelo de datos, mockups, cronograma, presupuesto y manual de usuario) está en
+modelo de datos, mockups, cronograma, presupuesto y [manual de usuario](docs/manual-usuario.md)) está en
 [`docs/`](docs/README.md).
 
 ## Equipo

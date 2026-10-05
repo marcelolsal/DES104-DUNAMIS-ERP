@@ -14,18 +14,16 @@ El desarrollo e implementación del **Sistema ERP para Autoescuela Dunamis** rep
 
 ## 2. Control Financiero y Mitigación de Pérdidas
 
-> **Alcance en curso:** el módulo de Pagos y los Reportes/KPIs aún no están integrados en el sistema. La tabla `pago` ya existe en la base de datos; lo descrito en esta sección es el valor esperado al completarlos.
-
-- **Visibilidad del flujo de caja (Cuentas por Cobrar):** Reemplazar el libro físico de pagos por un módulo de gestión financiera permite identificar de forma automática saldos pendientes, cobros vencidos y recaudación diaria/mensual.
+- **Visibilidad del flujo de caja (Cuentas por Cobrar):** El módulo de Pagos reemplaza el libro físico: registra abonos (pagados o pendientes), calcula el saldo de cada alumno (precio del paquete − abonos pagados) y marca como vencidos los abonos pendientes con fecha pasada. Un abono no puede exceder el saldo pendiente.
 - **Trazabilidad de abonos:** Cada pago queda vinculado de forma inequívoca al expediente del alumno, reduciendo el margen de error humano en registros manuales y evitando incongruencias en las cuentas finales.
-- **Reportes para toma de decisiones (en curso):** Generación de dashboards resumidos sobre ingresos reales vs. pendientes, facilitando proyecciones financieras precisas.
+- **Reportes para toma de decisiones:** El panel Finanzas muestra, por periodo (hasta 366 días), el total recaudado, lo pendiente de cobro y los cobros vencidos, además del ingreso del día y el saldo por cobrar global.
 
 ---
 
 ## 3. Optimización de Recursos Operativos y Mantenimiento
 
 - **Mayor control de la flota vehicular:** El módulo de mantenimientos y registro de kilometraje sustituye las fotos de odómetros enviadas por WhatsApp por un historial estructurado. Esto previene averías graves mediante registros oportunos de servicio; las alertas de mantenimiento forman parte del alcance previsto.
-- **Productividad y carga laboral de instructores:** Validación de solapes al programar clases, que evita choques de agenda (overbooking) o traslapes; el cálculo de horas impartidas por instructor ya existe en la API (métricas por instructor); su pantalla está en curso.
+- **Productividad y carga laboral de instructores:** Validación de solapes al programar clases, que evita choques de agenda (overbooking) o traslapes; la pantalla de Instructores muestra por cada uno sus horas impartidas y estudiantes asignados.
 
 ---
 
@@ -48,7 +46,7 @@ El desarrollo e implementación del **Sistema ERP para Autoescuela Dunamis** rep
 | Proceso                     | Situación Actual (AS-IS)                       | Con el Sistema ERP (TO-BE)                                      | Valor Agregado Directo                                           |
 | --------------------------- | ---------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------- |
 | **Inscripción**             | Llenado de contrato físico y archivo manual.   | Registro digital del alumno (respaldo de evidencia en Supabase Storage: previsto). | Cero riesgo de pérdida de expedientes; consulta inmediata.       |
-| **Control de Pagos**        | Anotaciones en libro contable físico.          | Módulo financiero con estados (Pagado, Pendiente, Vencido). *En curso.* | Control de morosidad y reportes de recaudación (al integrarse). |
+| **Control de Pagos**        | Anotaciones en libro contable físico.          | Módulo financiero con estados (Pagado, Pendiente, Vencido) y cuentas por cobrar. | Control de morosidad y reportes de recaudación. |
 | **Programación de Clases**  | Coordinación manual diaria por WhatsApp.       | Agenda centralizada en el sistema.                              | Eliminación de traslapes y ahorro significativo de horas/hombre. |
 | **Avance de Alumnos**       | Recuento de firmas físicas en bitácora.        | Barra de progreso digital por total de horas del paquete.       | Transparencia total para el estudiante y la administración.      |
 | **Mantenimiento Vehicular** | Envío de fotos por WhatsApp al jefe/encargado. | Registro estructurado de kilometraje y costos por vehículo.     | Control preventivo de costos operativos de la flota.             |

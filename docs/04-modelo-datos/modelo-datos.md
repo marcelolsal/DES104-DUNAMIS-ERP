@@ -48,6 +48,7 @@ erDiagram
         varchar nombre
         varchar especialidad
         varchar telefono
+        date fecha_ingreso
     }
     VEHICULO {
         int id_vehiculo PK
@@ -126,6 +127,7 @@ erDiagram
 | nombre | varchar | | Nombre completo. |
 | especialidad | varchar | | Especialidad (p. ej. autopistas, ciudad). |
 | telefono | varchar | | Teléfono de contacto. |
+| fecha_ingreso | date (nullable) | | Fecha de ingreso a la autoescuela (antigüedad). Opcional; no puede ser futura. Migración `0002_instructor_fecha_ingreso`. |
 
 ### Vehículo
 | Campo | Tipo | Clave | Descripción |
@@ -153,6 +155,6 @@ erDiagram
 | monto | decimal | | Monto del abono. |
 | fecha | date | | Fecha del pago. |
 | metodo | varchar | | Método (p. ej. efectivo, tarjeta, transferencia). |
-| estado | varchar | | Estado (p. ej. pagado, pendiente, vencido). |
+| estado | varchar | | Estado guardado: `pagado` o `pendiente`. `vencido` no se guarda: la API lo deriva de un `pendiente` con fecha pasada. |
 
 **Anterior:** [← Arquitectura](../03-arquitectura/diseno-tecnico.md) · **Siguiente:** [Mockups →](../05-diseno-ui/mockups.md)
