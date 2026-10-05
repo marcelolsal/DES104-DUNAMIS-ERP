@@ -16,4 +16,7 @@ export const clasesApi = {
   opciones: () => api<OpcionesClase>("/api/clases/opciones"),
   crear: (datos: NuevoClase) =>
     api<Clase>("/api/clases", { method: "POST", body: JSON.stringify(datos) }),
+  actualizar: (id: number, datos: NuevoClase) =>
+    api<Clase>(`/api/clases/${String(id)}`, { method: "PUT", body: JSON.stringify(datos) }),
+  eliminar: (id: number) => api<undefined>(`/api/clases/${String(id)}`, { method: "DELETE" }),
 };

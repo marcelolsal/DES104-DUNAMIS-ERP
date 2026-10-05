@@ -1,5 +1,6 @@
 // Lógica pura de la agenda semanal (sin React ni red) → testeable en aislamiento.
 // Todo en hora local del navegador, igual que la grilla que se pinta.
+import type { Clase } from "@dunamis/contracts";
 
 // Filas que la grilla muestra siempre; se amplían si hay clases fuera de ellas.
 export const HORA_BASE_INICIO = 7;
@@ -43,4 +44,13 @@ export const siguienteFranja = (ahora: Date): Date => {
     franja.setHours(HORA_BASE_INICIO, 0, 0, 0);
   }
   return franja;
+};
+
+type EstadoClase = Clase["estado"];
+
+// Cambios de estado que ofrece la UI. Solo se imparte una clase que ya empezó;
+// una impartida o cancelada solo vuelve a programada (para corregir un error).
+export const transiciones = (estado: EstadoClase, inicio: Date, ahora: Date): EstadoClase[] => {
+  if (estado !== "programada") return ["programada"];
+  return inicio <= ahora ? ["impartida", "cancelada"] : ["cancelada"];
 };

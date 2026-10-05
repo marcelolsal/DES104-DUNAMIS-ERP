@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { NuevoAlumno, Paquete, EstudianteListado } from "@dunamis/contracts";
 import { estudiantesApi } from "./api/estudiantes.js";
@@ -51,7 +51,8 @@ type Seccion = "estudiantes" | "instructores" | "paquetes" | "vehiculos" | "mant
 export const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [students, setStudents] = useState<EstudianteListado[]>([]);
+  // undefined = cargando: al volver a la pestaña no se muestran progreso ni estado viejos.
+  const [students, setStudents] = useState<EstudianteListado[]>();
   const [packages, setPackages] = useState<Paquete[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Todos");
@@ -61,6 +62,10 @@ export const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const [seccion, setSeccion] = useState<Seccion>("estudiantes");
+  const deleting = useRef(false);
+  const newButton = useRef<HTMLButtonElement>(null);
+  const ultimaCarga = useRef(0);
+  const haySesion = session !== null;
 
   useEffect(() => {
     let active = true;
@@ -93,16 +98,26 @@ export const App = () => {
     };
   }, []);
 
+  // Solo la última carga escribe: una respuesta lenta anterior no pisa datos más nuevos.
   async function loadStudents() {
-    const [studentData, packageData] = await Promise.all([estudiantesApi.listar(), estudiantesApi.paquetes()]);
-    setStudents(studentData);
-    setPackages(packageData);
+    const carga = ++ultimaCarga.current;
+    try {
+      const [studentData, packageData] = await Promise.all([estudiantesApi.listar(), estudiantesApi.paquetes()]);
+      if (carga !== ultimaCarga.current) return;
+      setStudents(studentData);
+      setPackages(packageData);
+    } catch (e: unknown) {
+      if (carga === ultimaCarga.current) throw e;
+    }
   }
 
+  // También al volver a la pestaña: marcar clases impartidas cambia progreso y estado.
+  // Vacía la lista solo aquí; guardar/eliminar recargan sin vaciar (sin parpadeo).
   useEffect(() => {
-    if (!session) return;
-    loadStudents().catch((e: unknown) => { setError(mensajeDeError(e)); });
-  }, [session]);
+    if (!haySesion || seccion !== "estudiantes") return;
+    setStudents(undefined);
+    loadStudents().catch((e: unknown) => { setError(mensajeDeError(e)); setStudents([]); });
+  }, [haySesion, seccion]);
 
   function openCreate() {
     setEditing(undefined);
@@ -134,6 +149,22 @@ export const App = () => {
     }
   }
 
+  const deleteStudent = async (student: EstudianteListado): Promise<void> => {
+    if (deleting.current || !window.confirm(`¿Eliminar al estudiante “${student.nombre}”? Esta acción no se puede deshacer.`)) return;
+    deleting.current = true;
+    setError(undefined);
+    try {
+      await estudiantesApi.eliminar(student.id_alumno);
+    } catch (e: unknown) {
+      setError(mensajeDeError(e)); // 409: tiene clases o pagos
+    } finally {
+      deleting.current = false;
+      newButton.current?.focus(); // la fila puede desaparecer
+      // También tras un 404: quita la fila obsoleta.
+      loadStudents().catch((e: unknown) => { setError(mensajeDeError(e)); });
+    }
+  };
+
   const handleLogout = async (): Promise<void> => {
     // Quita el #login heredado para volver a la landing, no al formulario.
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
@@ -144,7 +175,7 @@ export const App = () => {
   if (authLoading) return <main className="students-loading">Cargando sesión...</main>;
   if (!session) return <VistaPublica />;
 
-  const visibleStudents = students.filter((student) => {
+  const visibleStudents = (students ?? []).filter((student) => {
     const matchesSearch = `${student.nombre} ${student.correo}`.toLowerCase().includes(search.toLowerCase());
     return matchesSearch && (status === "Todos" || student.estado === status);
   });
@@ -172,7 +203,7 @@ export const App = () => {
       {seccion === "estudiantes" && <section className="students-content">
         <div className="students-heading">
           <div><p className="section-kicker">GESTIÓN</p><h1>ESTUDIANTES</h1></div>
-          <button className="primary-button" onClick={openCreate} type="button">+ NUEVO ESTUDIANTE</button>
+          <button className="primary-button" onClick={openCreate} ref={newButton} type="button">+ NUEVO ESTUDIANTE</button>
         </div>
         <div className="students-toolbar">
           <input aria-label="Buscar estudiantes" onChange={(event) => { setSearch(event.target.value); }} placeholder="Buscar por nombre o email..." value={search} />
@@ -187,18 +218,18 @@ export const App = () => {
             <tbody>
               {visibleStudents.map((student) => (
                 <tr key={student.id_alumno}>
-                  <td><strong>{student.nombre}</strong><small>{student.correo}</small></td>
+                  <td><strong>{student.nombre}</strong><small>{student.correo} · #{student.id_alumno}</small></td>
                   <td>{student.curso}</td>
                   <td>{student.instructor ?? "Sin asignar"}</td>
                   <td><div className="progress-cell"><span><i style={{ width: `${student.progreso}%` }} /></span>{student.horas_completadas}h</div></td>
                   <td><span className={`status-badge ${student.estado.toLowerCase()}`}>{student.estado.toUpperCase()}</span></td>
                   <td>{formatDate(student.fecha_inscripcion)}</td>
-                  <td><button className="edit-button" onClick={() => { openEdit(student); }} type="button">EDITAR</button></td>
+                  <td><button className="edit-button" onClick={() => { openEdit(student); }} type="button">EDITAR</button><button aria-label={`Eliminar a ${student.nombre}`} className="edit-button danger" onClick={() => { void deleteStudent(student); }} type="button">ELIMINAR</button></td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {visibleStudents.length === 0 && <p className="empty-state">No hay estudiantes que coincidan con la búsqueda.</p>}
+          {visibleStudents.length === 0 && <p className="empty-state">{students ? "No hay estudiantes que coincidan con la búsqueda." : "Cargando…"}</p>}
         </div>
       </section>}
       {modalOpen && <StudentModal editing={editing} error={error} form={form} loading={loading} packages={packages} onChange={setForm} onClose={() => { setModalOpen(false); setError(undefined); }} onSubmit={saveStudent} />}
