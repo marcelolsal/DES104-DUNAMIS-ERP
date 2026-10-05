@@ -1,11 +1,28 @@
-import { and, desc, eq, gte, lt, ne, or } from "drizzle-orm";
+import { and, desc, eq, gte, lt, ne, or, sql } from "drizzle-orm";
 import type { NuevoClase } from "@dunamis/contracts";
 import { config } from "../../shared/config.js";
 import { db } from "../../shared/db/client.js";
 import { alumno, clase, instructor, vehiculo } from "../../shared/db/schema.js";
 
+export type Transaccion = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+// Espacios de claves de pg_advisory_xact_lock(int4, int4) para la agenda.
+const BLOQUEO_INSTRUCTOR = 1701;
+const BLOQUEO_VEHICULO = 1702;
+
 // Única capa que toca la BD (Drizzle). ADR-0004.
 export const clasesRepository = {
+  // Validar solape y escribir van juntos en una transacción (ver bloquearAgenda).
+  transaccion: <T>(operacion: (tx: Transaccion) => Promise<T>) => db.transaction(operacion),
+
+  // Serializa las escrituras de un mismo instructor y de un mismo vehículo hasta
+  // el fin de la transacción. Siempre instructor y luego vehículo: un orden fijo
+  // evita interbloqueos entre dos transacciones.
+  bloquearAgenda: async (tx: Transaccion, idInstructor: number, idVehiculo: number) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(${BLOQUEO_INSTRUCTOR}, ${idInstructor})`);
+    await tx.execute(sql`select pg_advisory_xact_lock(${BLOQUEO_VEHICULO}, ${idVehiculo})`);
+  },
+
   listar: () => db.select().from(clase),
 
   listarAgenda: (desde: Date, hasta: Date) =>
@@ -46,11 +63,11 @@ export const clasesRepository = {
   obtener: (id: number) =>
     db.select().from(clase).where(eq(clase.id_clase, id)).then((r) => r[0] ?? null),
 
-  crear: (datos: NuevoClase) =>
-    db.insert(clase).values(datos).returning().then((r) => r[0]!),
+  crear: (datos: NuevoClase, tx: Transaccion) =>
+    tx.insert(clase).values(datos).returning().then((r) => r[0]!),
 
-  actualizar: (id: number, datos: NuevoClase) =>
-    db
+  actualizar: (id: number, datos: NuevoClase, tx: Transaccion) =>
+    tx
       .update(clase)
       .set(datos)
       .where(eq(clase.id_clase, id))
@@ -62,8 +79,11 @@ export const clasesRepository = {
 
   // Clases activas (no canceladas) del mismo instructor o vehículo, para el
   // chequeo de solapes. `excluirId` evita que una clase choque consigo misma al editar.
-  posiblesConflictos: (p: { id_instructor: number; id_vehiculo: number; excluirId?: number }) =>
-    db
+  posiblesConflictos: (
+    p: { id_instructor: number; id_vehiculo: number; excluirId?: number },
+    tx: Transaccion,
+  ) =>
+    tx
       .select()
       .from(clase)
       .where(
