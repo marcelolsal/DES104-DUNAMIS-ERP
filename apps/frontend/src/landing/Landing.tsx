@@ -171,7 +171,10 @@ const Landing = () => {
   // Solo ids simples; hashes como #access_token=... o #error=... se ignoran.
   useEffect(() => {
     const id = window.location.hash.slice(1);
-    if (/^[\w-]+$/.test(id)) document.getElementById(id)?.scrollIntoView();
+    const destino = /^[\w-]+$/.test(id) ? document.getElementById(id) : null;
+    // Sin sección destino (p. ej. tras cerrar sesión) arranca arriba, no con el scroll de la app.
+    if (destino) destino.scrollIntoView();
+    else window.scrollTo(0, 0);
   }, []);
   return (
     <div className="landing" id="inicio">

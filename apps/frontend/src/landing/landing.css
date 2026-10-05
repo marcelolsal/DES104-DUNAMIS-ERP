@@ -240,6 +240,12 @@
 .landing-volver:hover {
   color: #ff6b00;
 }
+/* Con el panel de arte visible (auth.css lo oculta ≤760px), baja bajo su .auth-art-line (top 60px). */
+@media (min-width: 761px) {
+  .landing-volver {
+    top: 80px;
+  }
+}
 
 /* El encabezado completo (marca + 5 enlaces + 2 botones) no cabe en una fila bajo ~1100px. */
 @media (max-width: 1100px) {
