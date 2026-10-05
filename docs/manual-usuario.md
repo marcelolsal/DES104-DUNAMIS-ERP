@@ -134,8 +134,10 @@ La tabla muestra **placa**, **vehículo** (modelo), **kilometraje** y **estado**
 La ventana se cierra con **Cancelar**, la **×**, la tecla **Esc** o un clic
 fuera de ella.
 
-> Solo los vehículos **Disponibles** pueden asignarse a clases. Cambia el estado
-> a «En mantenimiento» o «De baja» para que no se ofrezcan al programar.
+> Al programar una clase solo se pueden elegir los vehículos **Disponibles**; los
+> demás aparecen deshabilitados con la nota «(Mantenimiento)» o «(Baja)». Al
+> editar una clase se puede conservar el vehículo que ya tenía. Cambia el estado
+> a «En mantenimiento» o «De baja» para que no se ofrezca al programar.
 
 ### Detalle e historial de mantenimiento
 
@@ -230,18 +232,19 @@ cambios del formulario que no se hayan guardado.
 - **MARCAR IMPARTIDA** («Clase marcada como impartida.») solo aparece cuando
   ya llegó la hora de inicio; antes se ve el aviso «Se podrá marcar como
   impartida cuando llegue su hora.». Cada clase impartida suma una hora al
-  progreso del estudiante y a las horas del instructor. Si se intenta impartir
+  progreso del estudiante y su duración (60 minutos por defecto) a las horas
+  del instructor. Si se intenta impartir
   una clase futura, el sistema la rechaza con «No se puede marcar como
   impartida una clase que aún no empieza».
-- **CANCELAR CLASE** pide confirmación («¿Cancelar la clase de Nombre del
-  fecha a las hora?») y deja la clase como **Cancelada** («Clase cancelada.»).
+- **CANCELAR CLASE** pide confirmación (p. ej. «¿Cancelar la clase de Ana
+  López del 06-oct a las 11:00?») y deja la clase como **Cancelada** («Clase cancelada.»).
   La franja queda libre.
 - **VOLVER A PROGRAMADA** («La clase volvió a programada.») corrige un estado
   marcado por error. Desde **Impartida** pide confirmación y avisa «Se
-  descontará del progreso del alumno y de las horas del instructor.». Desde
-  **Cancelada** no pide confirmación, pero el sistema vuelve a validar el
-  solape: si en esa franja ya hay otra clase del instructor o del vehículo, no
-  se reactiva y aparece el aviso de solape.
+  descontará del progreso del alumno y de las horas del instructor.»; desde
+  **Cancelada** no pide confirmación. En ambos casos el sistema vuelve a validar
+  el solape: si en esa franja ya hay otra clase del instructor o del vehículo,
+  la clase no cambia de estado y aparece el aviso de solape.
 
 ### Eliminar una clase
 
@@ -249,7 +252,8 @@ Pulsa **ELIMINAR** y confirma («¿Eliminar definitivamente la clase de …? Par
 conservarla en el historial, mejor cancélala.»). Si la clase ya estaba
 impartida, el aviso agrega que se descontará del progreso del alumno y de las
 horas del instructor. Para dejar constancia de una clase que no se dio, usa
-**CANCELAR CLASE** en lugar de eliminarla.
+**CANCELAR CLASE** en lugar de eliminarla. Al confirmar aparece «Clase
+eliminada.» y la clase desaparece de la agenda.
 
 ## 8. Instructores
 
@@ -426,7 +430,7 @@ en línea ni muestra datos de la base de datos.
 | No se puede eliminar un instructor con clases asociadas                  | Tiene clases registradas; no se puede borrar.                                                      |
 | No se puede eliminar un alumno con clases o pagos asociados              | El estudiante tiene clases o pagos registrados; no se puede borrar.                                |
 | No se puede marcar como impartida una clase que aún no empieza           | Espera a la hora de inicio de la clase para marcarla.                                              |
-| El paquete N no existe / El alumno N no existe                           | El registro elegido ya no existe (p. ej. se borró en otra sesión). Recarga la página y elige otro. |
+| El paquete N / alumno N / instructor N / vehículo N no existe            | El registro elegido ya no existe (p. ej. se borró en otra sesión). Recarga la página y elige otro. |
 | Datos inválidos — fecha_ingreso: La fecha de ingreso no puede ser futura | Elige una fecha de ingreso de hoy o anterior, o déjala vacía.                                      |
 | El abono de X excede el saldo pendiente del alumno (Y)                   | Registra un monto igual o menor al saldo indicado.                                                 |
 | El rango no puede superar 366 días                                       | Acorta el periodo de Finanzas a un año como máximo.                                                |
