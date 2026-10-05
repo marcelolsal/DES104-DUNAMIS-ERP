@@ -1,6 +1,7 @@
 import { eq, sql, type SQL } from "drizzle-orm";
 import { reporteFinancieroSchema, type ReporteFinanciero } from "@dunamis/contracts";
 import { db } from "../../shared/db/client.js";
+import { parseSalida } from "../../shared/db/salida.js";
 import { alumno, pago, paquete } from "../../shared/db/schema.js";
 
 export interface FiltroReporteFinanciero {
@@ -63,7 +64,7 @@ export const reportesRepository = {
         .leftJoin(pagadoPorAlumno, eq(pagadoPorAlumno.id_alumno, alumno.id_alumno)),
     ]);
 
-    return reporteFinancieroSchema.parse({
+    return parseSalida(reporteFinancieroSchema, {
       desde: desde ?? null,
       hasta: hasta ?? null,
       hoy,

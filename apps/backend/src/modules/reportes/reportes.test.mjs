@@ -104,3 +104,14 @@ test("falla de la BD → 500 sin filtrar detalles", async () => {
   assert.equal(res.statusCode, 500);
   assert.deepEqual(res.json(), { error: "Error interno" });
 });
+
+test("salida de la BD fuera de contrato (monto negativo) → 500 sin filtrar detalles", async () => {
+  const { parseSalida } = await import("../../shared/db/salida.ts");
+  const { reporteFinancieroSchema } = await import("@dunamis/contracts");
+  reportesRepository.financiero.mock.mockImplementation(async () =>
+    parseSalida(reporteFinancieroSchema, { ...reporte, total_recaudado: -50 }),
+  );
+  const res = await pedir("/api/reportes/financiero");
+  assert.equal(res.statusCode, 500);
+  assert.deepEqual(res.json(), { error: "Error interno" });
+});
