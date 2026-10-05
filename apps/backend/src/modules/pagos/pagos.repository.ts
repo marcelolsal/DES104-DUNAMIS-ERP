@@ -43,8 +43,8 @@ export const pagosRepository = {
         .orderBy(desc(pago.fecha), desc(pago.id_pago))
     ).map(aPagoListado),
 
-  obtener: (id: number) =>
-    seleccionarPagos(db)
+  obtener: (id: number, ejecutor: Ejecutor = db) =>
+    seleccionarPagos(ejecutor)
       .where(eq(pago.id_pago, id))
       .then((resultados) => (resultados[0] ? aPagoListado(resultados[0]) : null)),
 

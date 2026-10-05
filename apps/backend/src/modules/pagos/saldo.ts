@@ -19,7 +19,8 @@ export const hoyEnElSalvador = (ahora: Date): string => diaEnElSalvador.format(a
 // Un abono pendiente cuya fecha ya pasó está vencido, aunque nadie lo haya
 // marcado: el estado guardado solo distingue cobrado de por cobrar.
 export const estadoEfectivo = (abono: Pick<Abono, "fecha" | "estado">, hoy: Date): EstadoPago =>
-  abono.estado === "pendiente" && abono.fecha.toISOString().slice(0, 10) < hoyEnElSalvador(hoy)
+  abono.estado === "pendiente" &&
+  abono.fecha.toISOString().slice(0, 10) < hoyEnElSalvador(hoy)
     ? "vencido"
     : abono.estado;
 

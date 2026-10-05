@@ -14,9 +14,12 @@ export const api = async <T>(path: string, init: RequestInit = {}): Promise<T> =
   else headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
+  // fetch rechaza con TypeError en inglés ("Failed to fetch") si no hay red.
   const res = await fetch(`${BASE}${path}`, {
     ...init,
     headers,
+  }).catch((error: unknown) => {
+    throw error instanceof TypeError ? new Error("No se pudo conectar con el servidor.") : error;
   });
 
   if (res.status === 401) {
