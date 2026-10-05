@@ -60,6 +60,8 @@ const ACCION: Record<Clase["estado"], { texto: string; exito: string }> = {
   programada: { texto: "VOLVER A PROGRAMADA", exito: "La clase volvió a programada." },
 };
 
+const AVISO_IMPARTIDA = "Se descontará del progreso del alumno y de las horas del instructor.";
+
 const cuando = (clase: ClaseAgenda) =>
   `${clase.alumno_nombre} del ${dayMonth.format(clase.fecha_hora)} a las ${hourMinute.format(clase.fecha_hora)}`;
 
@@ -165,6 +167,8 @@ export const ClasesPage = () => {
     );
   });
 
+  // Solo una clase programada se edita; impartida o cancelada primero vuelve a programada.
+  const bloqueada = original !== undefined && original.estado !== "programada";
   const dateRange = `${dayMonth.format(weekStart)} — ${dayMonthYear.format(addDays(weekStart, 6))}`;
   const etiquetaAlumno = etiquetadorAlumnos(options.alumnos);
 
@@ -226,6 +230,7 @@ export const ClasesPage = () => {
 
   const guardar = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (bloqueada) return;
     void ejecutar(
       () => (original ? clasesApi.actualizar(original.id_clase, form) : clasesApi.crear(form)),
       original ? "Clase actualizada." : "Clase programada correctamente.",
@@ -238,6 +243,12 @@ export const ClasesPage = () => {
     if (enviando.current) return;
     if (estado === "cancelada" && !window.confirm(`¿Cancelar la clase de ${cuando(clase)}?`))
       return;
+    const revertir = estado === "programada" && clase.estado === "impartida";
+    if (
+      revertir &&
+      !window.confirm(`¿Volver a programada la clase de ${cuando(clase)}? ${AVISO_IMPARTIDA}`)
+    )
+      return;
     const datos = { ...formDe(clase), estado };
     void ejecutar(
       () => clasesApi.actualizar(clase.id_clase, datos),
@@ -248,12 +259,14 @@ export const ClasesPage = () => {
 
   const eliminar = (clase: ClaseAgenda) => {
     if (enviando.current) return;
-    const pregunta = `¿Eliminar definitivamente la clase de ${cuando(clase)}? Para conservarla en el historial, mejor cancélala.`;
+    const aviso =
+      clase.estado === "impartida" ? ` La clase ya está impartida. ${AVISO_IMPARTIDA}` : "";
+    const pregunta = `¿Eliminar definitivamente la clase de ${cuando(clase)}?${aviso} Para conservarla en el historial, mejor cancélala.`;
     if (!window.confirm(pregunta)) return;
     void ejecutar(() => clasesApi.eliminar(clase.id_clase), "Clase eliminada.", weekStart).finally(
       () => {
         // El bloque desaparece: el foco va a un lugar estable.
-        if (!dialogo.current) botonNuevo.current?.focus();
+        if (!dialogo.current?.open) botonNuevo.current?.focus();
       },
     );
   };
@@ -528,12 +541,14 @@ export const ClasesPage = () => {
               {original.estado === "programada" && original.fecha_hora > new Date() && (
                 <p>Se podrá marcar como impartida cuando llegue su hora.</p>
               )}
+              {bloqueada && <p>Vuelve a programada para editar.</p>}
             </div>
           )}
           <form onSubmit={guardar}>
             <label>
               ESTUDIANTE
               <select
+                disabled={bloqueada}
                 required
                 onChange={(event) => {
                   setForm({ ...form, id_alumno: Number(event.target.value) });
@@ -553,6 +568,7 @@ export const ClasesPage = () => {
             <label>
               INSTRUCTOR
               <select
+                disabled={bloqueada}
                 required
                 onChange={(event) => {
                   setForm({ ...form, id_instructor: Number(event.target.value) });
@@ -572,6 +588,7 @@ export const ClasesPage = () => {
             <label>
               VEHÍCULO
               <select
+                disabled={bloqueada}
                 required
                 onChange={(event) => {
                   setForm({ ...form, id_vehiculo: Number(event.target.value) });
@@ -597,6 +614,7 @@ export const ClasesPage = () => {
             <label>
               FECHA Y HORA
               <input
+                disabled={bloqueada}
                 required
                 onChange={(event) => {
                   setForm({ ...form, fecha_hora: new Date(event.target.value) });
@@ -611,7 +629,12 @@ export const ClasesPage = () => {
               </button>
               {/* aria-disabled, no disabled: un botón deshabilitado pierde el foco y
                   close() ya no lo devuelve. El doble envío lo frena `enviando`. */}
-              <button aria-disabled={saving} className="schedule-primary" type="submit">
+              <button
+                aria-disabled={saving}
+                className="schedule-primary"
+                disabled={bloqueada}
+                type="submit"
+              >
                 {saving ? "GUARDANDO..." : "GUARDAR CLASE"}
               </button>
             </div>

@@ -41,6 +41,13 @@ const validarSolape = async (datos: NuevoClase, tx: Transaccion, excluirId?: num
   throw err(409, `Solape: ${quien} ya ${verbo} una clase en esa franja`);
 };
 
+// Una clase impartida suma horas al alumno: no puede estarlo antes de empezar.
+// Compara instantes con el reloj del servidor, no días.
+const validarImpartida = (datos: NuevoClase) => {
+  if (datos.estado === "impartida" && datos.fecha_hora.getTime() > Date.now())
+    throw err(400, "No se puede marcar como impartida una clase que aún no empieza");
+};
+
 // FK de Postgres (23503): una referencia se borró entre validarReferencias y la
 // escritura. Se revalida para responder el mismo 400 legible en vez de un 500.
 const conReferenciasValidas = async <T>(datos: NuevoClase, escribir: () => Promise<T>) => {
@@ -77,6 +84,7 @@ export const clasesService = {
   },
 
   crear: async (datos: NuevoClase) => {
+    validarImpartida(datos);
     await validarReferencias(datos);
     return conReferenciasValidas(datos, () =>
       clasesRepository.transaccion(async (tx) => {
@@ -87,6 +95,7 @@ export const clasesService = {
   },
 
   actualizar: async (id: number, datos: NuevoClase) => {
+    validarImpartida(datos);
     await clasesService.obtener(id); // 404 si no existe
     await validarReferencias(datos);
     const clase = await conReferenciasValidas(datos, () =>

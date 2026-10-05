@@ -134,3 +134,28 @@ test("PUT de una clase borrada en paralelo (el UPDATE no devuelve fila) → 404"
   assert.equal(res.statusCode, 404);
   assert.deepEqual(res.json(), { error: "Clase no encontrada" });
 });
+
+test("clase impartida con fecha futura → 400 sin tocar la BD; pasada no se rechaza", async () => {
+  const futura = new Date(Date.now() + 60_000).toISOString();
+  for (const [method, url] of [
+    ["POST", "/api/clases"],
+    ["PUT", "/api/clases/7"],
+  ]) {
+    const res = await pedir(method, url, { ...clase, fecha_hora: futura, estado: "impartida" });
+    assert.equal(res.statusCode, 400, `${method} ${url}`);
+    assert.deepEqual(res.json(), {
+      error: "No se puede marcar como impartida una clase que aún no empieza",
+    });
+  }
+  // Pasada: supera la regla y llega a validar referencias (que aquí fallan con 400 propio).
+  mock.method(clasesRepository, "existeAlumno", async () => false);
+  mock.method(clasesRepository, "existeInstructor", async () => true);
+  mock.method(clasesRepository, "existeVehiculo", async () => true);
+  const pasada = new Date(Date.now() - 60_000).toISOString();
+  const res = await pedir("POST", "/api/clases", {
+    ...clase,
+    fecha_hora: pasada,
+    estado: "impartida",
+  });
+  assert.deepEqual(res.json(), { error: "El alumno 1 no existe" });
+});
