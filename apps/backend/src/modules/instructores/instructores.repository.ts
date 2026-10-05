@@ -1,18 +1,32 @@
 import { eq } from "drizzle-orm";
-import type { NuevoInstructor, ActualizarInstructor } from "@dunamis/contracts";
+import {
+  instructorSchema,
+  type NuevoInstructor,
+  type ActualizarInstructor,
+  type Instructor,
+} from "@dunamis/contracts";
 import { db } from "../../shared/db/client.js";
 import { instructor, clase } from "../../shared/db/schema.js";
 
+// Drizzle devuelve `date` como "YYYY-MM-DD"; el contrato la expone como Date
+// (medianoche UTC), igual que pagos y mantenimientos.
+const aInstructor = (registro: typeof instructor.$inferSelect): Instructor =>
+  instructorSchema.parse(registro);
+
 // Única capa que toca la BD (Drizzle). ADR-0004.
 export const instructoresRepository = {
-  listar: () => db.select().from(instructor),
+  listar: () =>
+    db
+      .select()
+      .from(instructor)
+      .then((r) => r.map(aInstructor)),
 
   obtener: (id: number) =>
     db
       .select()
       .from(instructor)
       .where(eq(instructor.id_instructor, id))
-      .then((r) => r[0] ?? null),
+      .then((r) => (r[0] ? aInstructor(r[0]) : null)),
 
   crear: (datos: NuevoInstructor) =>
     db
@@ -22,7 +36,7 @@ export const instructoresRepository = {
       .then((r) => {
         const creado = r[0];
         if (!creado) throw new Error("No se pudo crear el instructor");
-        return creado;
+        return aInstructor(creado);
       }),
 
   actualizar: (id: number, datos: ActualizarInstructor) =>
@@ -31,7 +45,7 @@ export const instructoresRepository = {
       .set(datos)
       .where(eq(instructor.id_instructor, id))
       .returning()
-      .then((r) => r[0] ?? null),
+      .then((r) => (r[0] ? aInstructor(r[0]) : null)),
 
   eliminar: (id: number) => db.delete(instructor).where(eq(instructor.id_instructor, id)),
 

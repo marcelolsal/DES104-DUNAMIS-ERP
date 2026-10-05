@@ -5,6 +5,7 @@ import { estudiantesApi } from "./api/estudiantes.js";
 import { VistaPublica } from "./landing/Landing.js";
 import { supabase } from "./auth/supabase.js";
 import type { Session } from "@supabase/supabase-js";
+import { InstructoresPanel } from "./components/InstructoresPanel.js";
 import { MantenimientosPanel } from "./components/MantenimientosPanel.js";
 import { PaquetesPanel } from "./components/PaquetesPanel.js";
 import { VehiculosPanel } from "./components/VehiculosPanel.js";
@@ -41,7 +42,7 @@ function formFromStudent(student: EstudianteListado): NuevoAlumno {
   };
 }
 
-type Seccion = "estudiantes" | "paquetes" | "vehiculos" | "mantenimientos" | "clases";
+type Seccion = "estudiantes" | "instructores" | "paquetes" | "vehiculos" | "mantenimientos" | "clases";
 
 export const App = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -151,12 +152,13 @@ export const App = () => {
         <div className="students-user"><strong>{session.user.email}</strong><button onClick={handleLogout} type="button">Cerrar sesión</button></div>
       </header>
       <nav className="tabs" aria-label="Módulos">
-        {(["estudiantes", "paquetes", "vehiculos", "mantenimientos", "clases"] as Seccion[]).map((item) => (
+        {(["estudiantes", "instructores", "paquetes", "vehiculos", "mantenimientos", "clases"] as Seccion[]).map((item) => (
           <button className={seccion === item ? "active" : undefined} key={item} type="button" onClick={() => { setSeccion(item); }}>
             {item === "clases" ? "Clases" : item[0]?.toUpperCase() + item.slice(1)}
           </button>
         ))}
       </nav>
+      {seccion === "instructores" && <InstructoresPanel />}
       {seccion === "paquetes" && <PaquetesPanel />}
       {seccion === "vehiculos" && <VehiculosPanel />}
       {seccion === "mantenimientos" && <MantenimientosPanel />}

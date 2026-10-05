@@ -15,6 +15,13 @@
       "when": 1791088543809,
       "tag": "0001_vehiculo_placa_unica",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791167424756,
+      "tag": "0002_instructor_fecha_ingreso",
+      "breakpoints": true
     }
   ]
 }
