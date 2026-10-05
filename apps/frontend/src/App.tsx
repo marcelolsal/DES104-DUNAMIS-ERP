@@ -12,6 +12,8 @@ import { VehiculosPanel } from "./components/VehiculosPanel.js";
 import { ClasesPage } from "./components/ClasesPage.js";
 import { PagosPage } from "./components/PagosPage.js";
 import { KpisPanel } from "./components/KpisPanel.js";
+import { ApiMessage, mensajeDeError } from "./components/ApiMessage.js";
+import { hoyEnElSalvador } from "./kpis.js";
 import "./app.css";
 import "./students.css";
 
@@ -21,7 +23,7 @@ const emptyForm: NuevoAlumno = {
   correo: "",
   telefono: "",
   contacto_emergencia: "",
-  fecha_inscripcion: new Date(),
+  fecha_inscripcion: "",
   id_paquete: 1,
 };
 
@@ -40,7 +42,7 @@ function formFromStudent(student: EstudianteListado): NuevoAlumno {
     telefono: student.telefono,
     contacto_emergencia: student.contacto_emergencia,
     id_paquete: student.id_paquete,
-    fecha_inscripcion: new Date(`${student.fecha_inscripcion}T00:00:00`),
+    fecha_inscripcion: student.fecha_inscripcion,
   };
 }
 
@@ -99,12 +101,12 @@ export const App = () => {
 
   useEffect(() => {
     if (!session) return;
-    loadStudents().catch((e: unknown) => setError(String(e)));
+    loadStudents().catch((e: unknown) => { setError(mensajeDeError(e)); });
   }, [session]);
 
   function openCreate() {
     setEditing(undefined);
-    setForm({ ...emptyForm, fecha_inscripcion: new Date() });
+    setForm({ ...emptyForm, fecha_inscripcion: hoyEnElSalvador(new Date()) });
     setModalOpen(true);
     setError(undefined);
   }
@@ -126,7 +128,7 @@ export const App = () => {
       await loadStudents();
       setModalOpen(false);
     } catch (e: unknown) {
-      setError(String(e));
+      setError(mensajeDeError(e));
     } finally {
       setLoading(false);
     }
@@ -178,7 +180,7 @@ export const App = () => {
             <option>Todos</option><option>Activo</option><option>Graduado</option>
           </select>
         </div>
-        {error && <p className="students-error">{error}</p>}
+        {error && !modalOpen && <p className="students-error">{error}</p>}
         <div className="students-table-wrap">
           <table className="students-table">
             <thead><tr><th>NOMBRE</th><th>CURSO</th><th>INSTRUCTOR</th><th>HORAS</th><th>ESTADO</th><th>INGRESO</th><th aria-label="Acciones" /></tr></thead>
@@ -199,13 +201,13 @@ export const App = () => {
           {visibleStudents.length === 0 && <p className="empty-state">No hay estudiantes que coincidan con la búsqueda.</p>}
         </div>
       </section>}
-      {modalOpen && <StudentModal editing={editing} form={form} loading={loading} packages={packages} onChange={setForm} onClose={() => { setModalOpen(false); }} onSubmit={saveStudent} />}
+      {modalOpen && <StudentModal editing={editing} error={error} form={form} loading={loading} packages={packages} onChange={setForm} onClose={() => { setModalOpen(false); }} onSubmit={saveStudent} />}
     </main>
   );
 };
 
-function StudentModal({ editing, form, loading, packages, onChange, onClose, onSubmit }: { editing?: EstudianteListado; form: NuevoAlumno; loading: boolean; packages: Paquete[]; onChange: (form: NuevoAlumno) => void; onClose: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
-  const update = (field: keyof NuevoAlumno, value: string | number | Date) => onChange({ ...form, [field]: value });
+function StudentModal({ editing, error, form, loading, packages, onChange, onClose, onSubmit }: { editing?: EstudianteListado; error?: string; form: NuevoAlumno; loading: boolean; packages: Paquete[]; onChange: (form: NuevoAlumno) => void; onClose: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
+  const update = (field: keyof NuevoAlumno, value: string | number) => onChange({ ...form, [field]: value });
   return <div className="modal-backdrop"><section aria-labelledby="modal-title" className="student-modal">
     <button aria-label="Cerrar" className="modal-close" onClick={onClose} type="button">×</button>
     <p className="section-kicker">GESTIÓN</p><h2 id="modal-title">{editing ? "EDITAR ESTUDIANTE" : "NUEVO ESTUDIANTE"}</h2>
@@ -214,7 +216,8 @@ function StudentModal({ editing, form, loading, packages, onChange, onClose, onS
       <label>Correo<input required type="email" onChange={(event) => { update("correo", event.target.value); }} value={form.correo} /></label>
       <div className="form-grid"><label>DUI<input required onChange={(event) => { update("dui", event.target.value); }} value={form.dui} /></label><label>Teléfono<input required onChange={(event) => { update("telefono", event.target.value); }} value={form.telefono} /></label></div>
       <label>Contacto de emergencia<input required onChange={(event) => { update("contacto_emergencia", event.target.value); }} value={form.contacto_emergencia} /></label>
-      <div className="form-grid"><label>Curso<select onChange={(event) => { update("id_paquete", Number(event.target.value)); }} value={form.id_paquete}>{packages.map((item) => <option key={item.id_paquete} value={item.id_paquete}>{item.nombre}</option>)}</select></label><label>Fecha de ingreso<input required onChange={(event) => { update("fecha_inscripcion", new Date(`${event.target.value}T00:00:00`)); }} type="date" value={form.fecha_inscripcion.toISOString().slice(0, 10)} /></label></div>
+      <div className="form-grid"><label>Curso<select onChange={(event) => { update("id_paquete", Number(event.target.value)); }} value={form.id_paquete}>{packages.map((item) => <option key={item.id_paquete} value={item.id_paquete}>{item.nombre}</option>)}</select></label><label>Fecha de ingreso<input required onChange={(event) => { update("fecha_inscripcion", event.target.value); }} type="date" value={form.fecha_inscripcion} /></label></div>
+      <ApiMessage error={error} />
       <div className="modal-actions"><button className="secondary-button" onClick={onClose} type="button">CANCELAR</button><button className="primary-button" disabled={loading} type="submit">{loading ? "GUARDANDO..." : "GUARDAR"}</button></div>
     </form>
   </section></div>;

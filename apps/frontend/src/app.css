@@ -9,7 +9,7 @@ button { background: #fff; border: 1px solid #aeb9ca; border-radius: 5px; color:
 button:hover { background: #edf1f8; }
 button.primary, .tabs button.active { background: #1455b8; border-color: #1455b8; color: #fff; }
 button.danger { border-color: #bc3030; color: #9d1f1f; }
-.module-panel { background: #fff; border: 1px solid #dce2ec; border-radius: 8px; padding: 20px; }
+.module-panel { background: #fff; color: #172033; border: 1px solid #dce2ec; border-radius: 8px; padding: 20px; }
 .api-message { border-radius: 5px; margin: 16px 0; padding: 12px; }
 .api-message--error { background: #fff0f0; border: 1px solid #edbaba; color: #961f1f; }
 .api-message--success { background: #eaf8ee; border: 1px solid #afdcbc; color: #17642d; }
