@@ -51,7 +51,8 @@ type Seccion = "estudiantes" | "instructores" | "paquetes" | "vehiculos" | "mant
 export const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [students, setStudents] = useState<EstudianteListado[]>([]);
+  // undefined = cargando: al volver a la pestaña no se muestran progreso ni estado viejos.
+  const [students, setStudents] = useState<EstudianteListado[]>();
   const [packages, setPackages] = useState<Paquete[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Todos");
@@ -63,6 +64,8 @@ export const App = () => {
   const [seccion, setSeccion] = useState<Seccion>("estudiantes");
   const deleting = useRef(false);
   const newButton = useRef<HTMLButtonElement>(null);
+  const ultimaCarga = useRef(0);
+  const haySesion = session !== null;
 
   useEffect(() => {
     let active = true;
@@ -95,17 +98,26 @@ export const App = () => {
     };
   }, []);
 
+  // Solo la última carga escribe: una respuesta lenta anterior no pisa datos más nuevos.
   async function loadStudents() {
-    const [studentData, packageData] = await Promise.all([estudiantesApi.listar(), estudiantesApi.paquetes()]);
-    setStudents(studentData);
-    setPackages(packageData);
+    const carga = ++ultimaCarga.current;
+    try {
+      const [studentData, packageData] = await Promise.all([estudiantesApi.listar(), estudiantesApi.paquetes()]);
+      if (carga !== ultimaCarga.current) return;
+      setStudents(studentData);
+      setPackages(packageData);
+    } catch (e: unknown) {
+      if (carga === ultimaCarga.current) throw e;
+    }
   }
 
   // También al volver a la pestaña: marcar clases impartidas cambia progreso y estado.
+  // Vacía la lista solo aquí; guardar/eliminar recargan sin vaciar (sin parpadeo).
   useEffect(() => {
-    if (!session || seccion !== "estudiantes") return;
-    loadStudents().catch((e: unknown) => { setError(mensajeDeError(e)); });
-  }, [session, seccion]);
+    if (!haySesion || seccion !== "estudiantes") return;
+    setStudents(undefined);
+    loadStudents().catch((e: unknown) => { setError(mensajeDeError(e)); setStudents([]); });
+  }, [haySesion, seccion]);
 
   function openCreate() {
     setEditing(undefined);
@@ -163,7 +175,7 @@ export const App = () => {
   if (authLoading) return <main className="students-loading">Cargando sesión...</main>;
   if (!session) return <VistaPublica />;
 
-  const visibleStudents = students.filter((student) => {
+  const visibleStudents = (students ?? []).filter((student) => {
     const matchesSearch = `${student.nombre} ${student.correo}`.toLowerCase().includes(search.toLowerCase());
     return matchesSearch && (status === "Todos" || student.estado === status);
   });
@@ -217,7 +229,7 @@ export const App = () => {
               ))}
             </tbody>
           </table>
-          {visibleStudents.length === 0 && <p className="empty-state">No hay estudiantes que coincidan con la búsqueda.</p>}
+          {visibleStudents.length === 0 && <p className="empty-state">{students ? "No hay estudiantes que coincidan con la búsqueda." : "Cargando…"}</p>}
         </div>
       </section>}
       {modalOpen && <StudentModal editing={editing} error={error} form={form} loading={loading} packages={packages} onChange={setForm} onClose={() => { setModalOpen(false); setError(undefined); }} onSubmit={saveStudent} />}
